@@ -6,7 +6,7 @@ library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- "/Users/gad479/Documents/GD_scRNA_Pipeline"
+snRNA_home_dir <- "__HOME_DIR__"
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script

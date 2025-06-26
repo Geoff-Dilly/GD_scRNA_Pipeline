@@ -12,7 +12,7 @@ scConfig.Prefix <- "GD_snRNA"
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located
 # This is generally not needed but good to note
-scConfig.Home_folder <-   "/Users/gad479/Documents/GD_scRNA_Pipeline"
+scConfig.Home_folder <-   "__HOME_DIR__"
 
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "/Users/gad479/Documents/GD_scRNA_Pipeline";
+cd "__HOME_DIR__";
 
 R --quiet --no-restore --file="Scripts/Load_10x_Data.R";
 #!R --quiet --no-restore --file="Scripts/Run_SoupX.R";
