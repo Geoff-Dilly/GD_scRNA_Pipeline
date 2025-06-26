@@ -1,0 +1,5 @@
+# Ignore generated data and logs
+*.Rproj
+.Rhistory
+.RData
+.DS_Store
