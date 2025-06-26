@@ -1,4 +1,14 @@
+# Ignore Configuration files
+sc_experiment_config.R
+sc_sample_metadata.csv
+
 # Ignore generated data and logs
+R_Data/
+Raw_Data/
+Logs/
+Plots/
+
+# Ignore R files and DS_Store
 *.Rproj
 .Rhistory
 .RData
