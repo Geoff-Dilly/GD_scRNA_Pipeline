@@ -2,13 +2,14 @@
 # Purpose: Run SoupX on single sample Seurat objects
 # Author: Geoff Dilly
 
+library(here)
 library(Seurat)
 library(SoupX)
 library(DropletUtils)
 library(ggplot2)
 library(DoubletFinder)
 library(knitr)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script

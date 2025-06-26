@@ -1,6 +1,9 @@
 #!/bin/bash
 
-cd "__HOME_DIR__";
+# Find the absolute path to the project directory and call it
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_HOME="$SCRIPTS_DIR/.." 
+cd "$PROJECT_HOME"
 
 R --quiet --no-restore --file="Scripts/Load_10x_Data.R";
 #!R --quiet --no-restore --file="Scripts/Run_SoupX.R";

@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Get file contaning sn_directoy_setup script
+# Get the folder containing install.sh script
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
+
+snRNA_home_dir=$(pwd)
+echo "Setting up scRNA analysis pipeline in: \n"
+echo $snRNA_home_dir
 
 # Create the directories that the single-cell pipeline needs to run
 mkdir -p "CSV_Results/Cluster_Counts"
@@ -20,9 +24,6 @@ mkdir -p "Plots/Quality_Control"
 mkdir -p "R_Data"
 mkdir -p "Scripts"
 mkdir -p "Logs"
-
-snRNA_home_dir=$(pwd)
-echo $snRNA_home_dir
 
 echo 'snRNA_home_dir <- "'${snRNA_home_dir}'"' >> "analysis_home_dir.R"
 cat "analysis_home_dir.R"
@@ -965,7 +966,7 @@ scConfig.remove_doublets <- FALSE
 
 # remove_mito_genes - Datatype: Bool (TRUE/FALSE)
 # If TRUE mitochondrial genes will be removed prior to clustering
-scConfig.remove_mito_genes <- FALSE
+scConfig.remove_mito_genes <- FALSE 
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)
 # If TRUE the 25% of cells with the highest UMI count will be removed from the data
@@ -1001,3 +1002,5 @@ EOF
 sed 's|__HOME_DIR__|'"$snRNA_home_dir"'|' Scripts/Run_Analysis_Verbose.bash > temp && mv temp Scripts/Run_Analysis_Verbose.bash
 
 chmod u+x Scripts/Run_Analysis_Verbose.bash
+
+echo "Setup Complete"

@@ -2,8 +2,9 @@
 # Purpose: Insert cell type labels into a Seurat object
 # Author: Geoff Dilly
 
+library(here)
 library(Seurat)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script

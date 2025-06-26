@@ -2,11 +2,12 @@
 # Purpose: Make various plots for single-cell analysis
 # Author: Geoff Dilly
 
+library(here)
 library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
