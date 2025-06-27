@@ -1,5 +1,27 @@
+# Ignore Configuration files
+sc_experiment_config.R
+sc_sample_metadata.csv
+
+# Ignore Configuration files
+sc_experiment_config.R
+sc_sample_metadata.csv
+
 # Ignore generated data and logs
+R_Data/
+Raw_Data/
+Logs/
+Plots/
+CSV_Results/
+renv.lock
+snRNA_Log.txt
+
+# Ignore R files and DS_Store
 *.Rproj
 .Rhistory
 .RData
 .DS_Store
+.lintr
+
+# Ignore Scripts
+Scripts/Install_Packages.R
+Scripts/One_var_DGE_Analysis.R

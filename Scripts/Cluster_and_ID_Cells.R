@@ -28,8 +28,8 @@ write.csv(cells_per_sample, "CSV_Results/Cells_per_sample.csv")
 # Check quality metrics for each cell
 QC_Violins_Plot <- VlnPlot(Combined_Seurat, features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "Doublet_Score"), ncol = 4, pt.size = 0)
 pdf("Plots/Quality_Control/QC_VlnPlot.pdf", height = 6, width = 10)
-  print(QC_Violins_Plot)
-  dev.off()
+print(QC_Violins_Plot)
+dev.off()
 
 # Scale data and run UMAP ----------------------
 # Perform PCA
@@ -38,13 +38,13 @@ Combined_Seurat <- RunPCA(Combined_Seurat, npcs = 100 ,verbose = TRUE)
 # Visualize the dimensionality of the PCs and pick the number of PCs
 DimHeatmaps_Plot <- DimHeatmap(Combined_Seurat, dims = 1:9, cells = 500, balanced = TRUE)
 pdf("Plots/Quality_Control/Dim_Heatmap.pdf", height = 6, width = 8)
-  print(DimHeatmaps_Plot)
-  dev.off()
+print(DimHeatmaps_Plot)
+dev.off()
 
 Elbow_Plot <- ElbowPlot(Combined_Seurat, ndims = 100)
 pdf("Plots/Quality_Control/Elbowplot.pdf")
-  print(Elbow_Plot)
-  dev.off()
+print(Elbow_Plot)
+dev.off()
 # I chose 25 PCs
 
 # Perform UMAP dimensional reduction on the data
@@ -53,14 +53,14 @@ Combined_Seurat <- RunUMAP(Combined_Seurat, reduction = "pca", dims = 1:25)
 # Examine the resulting UMAP-------------
 Raw_UMAP_Plot <- DimPlot(Combined_Seurat)
 pdf("Plots/Clustering_Plots/Raw_UMAP.pdf", height = 4, width = 6)
-  print(Raw_UMAP_Plot)
-  dev.off()
+print(Raw_UMAP_Plot)
+dev.off()
 
 # Examine the UMAP Plot for quality control and viability
 QC_UMAP_Plot <- FeaturePlot(Combined_Seurat, features = c("percent_mito","nFeature_RNA", "Doublet_Score"), ncol=3)
 pdf("Plots/Quality_Control/QC_UMAP.pdf", height = 4, width = 12)
-  print(QC_UMAP_Plot)
-  dev.off()
+print(QC_UMAP_Plot)
+dev.off()
 
 # Perform clustering -----------------------
 # Identifies clusters of cells within the UMAP
@@ -78,29 +78,29 @@ saveRDS(Combined_Seurat, paste0("R_Data/",scConfig.Prefix ,"_combined_clustered.
 # Examine the resulting UMAP-------------
 Clustered_UMAP_Plot <- DimPlot(Combined_Seurat, label = TRUE)
 pdf("Plots/Clustering_Plots/Clustered_UMAP.pdf", height = 4, width = 6)
-  print(Clustered_UMAP_Plot)
-  dev.off()
+print(Clustered_UMAP_Plot)
+dev.off()
 
 # Visualize QC metrics in each cluster
 percent_mito_vln_Plot <- VlnPlot(Combined_Seurat, features = "percent_mito", pt.size = 0)
 pdf("Plots/Clustering_Plots/PercentMito_Violin.pdf")
-  print(percent_mito_vln_Plot)
-  dev.off()
+print(percent_mito_vln_Plot)
+dev.off()
 
 nFeature_vln_Plot <- VlnPlot(Combined_Seurat, features = "nFeature_RNA", pt.size = 0)
 pdf("Plots/Clustering_Plots/overall_nFeature_Violin.pdf")
-  print(nFeature_vln_Plot)
-  dev.off()
+print(nFeature_vln_Plot)
+dev.off()
 
 nCount_vln_Plot <- VlnPlot(Combined_Seurat, features = "nCount_RNA", pt.size = 0)
 pdf("Plots/Clustering_Plots/nCount_Violin.pdf")
-  print(nCount_vln_Plot)
-  dev.off()
+print(nCount_vln_Plot)
+dev.off()
 
 Doublet_score_vln_Plot <- VlnPlot(Combined_Seurat, features = "Doublet_Score", pt.size = 0)
 pdf("Plots/Quality_Control/Doublet_Score_Violin.pdf")
-  print(Doublet_score_vln_Plot)
-  dev.off()
+print(Doublet_score_vln_Plot)
+dev.off()
 
 # Visualize marker gene expression in each cluster
 # Using markers from my paper
@@ -113,26 +113,26 @@ id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
 
 Major_cells_dotplot <- DotPlot(Combined_Seurat, features = id_features)+RotatedAxis()
 pdf("Plots/Clustering_Plots/Major_cells_dotplot.pdf")
-  print(Major_cells_dotplot)
-  dev.off()
+print(Major_cells_dotplot)
+dev.off()
 
 # Examine QC metrics by animal
 Idents(Combined_Seurat) <- Combined_Seurat$Sample_name
 
 nFeature_ViolinPlot_byAnimal <- VlnPlot(Combined_Seurat, features = "nFeature_RNA", pt.size = 0)
 pdf("Plots/Quality_Control/nFeature_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
-  print(nFeature_ViolinPlot_byAnimal)
-  dev.off()
+print(nFeature_ViolinPlot_byAnimal)
+dev.off()
 
 nCount_ViolinPlot_byAnimal <- VlnPlot(Combined_Seurat, features = "nCount_RNA", pt.size = 0)
 pdf("Plots/Quality_Control/nCount_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
-  print(nCount_ViolinPlot_byAnimal)
-  dev.off()
+print(nCount_ViolinPlot_byAnimal)
+dev.off()
 
 percent_mito_ViolinPlot_byAnimal <- VlnPlot(Combined_Seurat, features = "percent_mito", pt.size = 0)
 pdf("Plots/Quality_Control/pctMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
-  print(percent_mito_ViolinPlot_byAnimal)
-  dev.off()
+print(percent_mito_ViolinPlot_byAnimal)
+dev.off()
 
 # Log the completion time
 write(paste0("Cluster_and_ID_Cells - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
