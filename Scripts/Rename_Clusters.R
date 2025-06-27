@@ -2,12 +2,13 @@
 # Purpose: Insert cell type labels into a Seurat object
 # Author: Geoff Dilly
 
+library(here)
 library(Seurat)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Rename_Clusters - Start: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Rename_Clusters - Start: ", Sys.time()),file = "snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Rename_Clusters.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Rename_Clusters.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata

@@ -2,15 +2,15 @@
 # Purpose: Merges Seurat objects from multiple samples and normalized the resulting object with SCTransform
 # Author: Geoff Dilly
 
-library(dplyr)
+library(here)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Merge_and_Normalize - Start: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Merge_and_Normalize - Start: ", Sys.time()),file = "snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Merge_and_Normalize.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Merge_and_Normalize.R"), overwrite = FALSE)
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage

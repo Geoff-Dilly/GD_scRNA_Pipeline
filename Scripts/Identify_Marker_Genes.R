@@ -2,15 +2,16 @@
 # Purpose: Performs FindAllMarkers on a clustered Seurat objects and saves lists of marker genes
 # Author: Geoff Dilly
 
+library(here)
 library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Identify_Marker_Genes - Start: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Identify_Marker_Genes - Start: ", Sys.time()), file="snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Identify_Marker_Genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Identify_Marker_Genes.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata

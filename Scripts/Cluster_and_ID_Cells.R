@@ -2,15 +2,16 @@
 # Purpose: Performs the standard Seurat clustering workflow on a normalized Seurat object
 # Author: Geoff Dilly
 
+library(here)
 library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- "__HOME_DIR__"
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Cluster_and_ID_Cells - Start: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Cluster_and_ID_Cells - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Cluster_and_ID_Cells.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Cluster_and_ID_Cells.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
@@ -18,11 +19,11 @@ source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Load normalized data
-Combined_Seurat <- readRDS(paste0("R_Data/",scConfig.Prefix ,"_combined_SCT.rds"))
+Combined_Seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_SCT.rds"))
 
 # Get the number of cells per each sample
 cells_per_sample <- table(Combined_Seurat$Sample_name)
-write.csv(cells_per_sample,"CSV_Results/Cells_per_sample.csv")
+write.csv(cells_per_sample, "CSV_Results/Cells_per_sample.csv")
 
 # Check quality metrics for each cell
 QC_Violins_Plot <- VlnPlot(Combined_Seurat, features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "Doublet_Score"), ncol = 4, pt.size = 0)
@@ -134,4 +135,4 @@ pdf("Plots/Quality_Control/pctMito_ViolinPlot_byAnimal.pdf", height = 4, width =
   dev.off()
 
 # Log the completion time
-write(paste0("Cluster_and_ID_Cells - Finish: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Cluster_and_ID_Cells - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
