@@ -10,11 +10,11 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Merge_and_Normalize - Start: ", Sys.time()),file = "snRNA_Log.txt", append = TRUE)
+write(paste0("Merge_and_Normalize - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Merge_and_Normalize.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Merge_and_Normalize.R"), overwrite = FALSE)
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
-Sys.setenv('R_MAX_VSIZE'=32000000000)
+Sys.setenv("R_MAX_VSIZE" = 32000000000)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -34,32 +34,33 @@ for (sample in str_sample_list) {
 
 # Merge samples into one Seurat object without integration
 # Convert the list of Seurat objects to a list of arguments for the merge function
-#! MergeNorm_Combined_Seurat <- merge, c(seurat_objects[[1]], seurat_objects[-1]))
-MergeNorm_Combined_Seurat <- merge(x = seurat_objects[[1]], y = seurat_objects[-1], add.cell.ids = str_sample_list)
+#! mergenorm_combined_seurat <- merge, c(seurat_objects[[1]], seurat_objects[-1]))
+mergenorm_combined_seurat <- merge(x = seurat_objects[[1]], y = seurat_objects[-1], add.cell.ids = str_sample_list)
 
-saveRDS(MergeNorm_Combined_Seurat, paste0("R_Data/",scConfig.Prefix ,"_combined_merged.rds"))
+saveRDS(mergenorm_combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_merged.rds"))
 rm(seurat_objects)
-MergeNorm_Combined_Seurat <- readRDS(paste0("R_Data/",scConfig.Prefix ,"_combined_merged.rds"))
+mergenorm_combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_merged.rds"))
 
 # Remove called doublets if you want to
-if(scConfig.remove_doublets == TRUE) {
-  MergeNorm_Combined_Seurat <- subset(MergeNorm_Combined_Seurat, subset = Doublet_Call == "Singlet")}
+if (scConfig.remove_doublets == TRUE) {
+  mergenorm_combined_seurat <- subset(mergenorm_combined_seurat, subset = Doublet_Call == "Singlet")
+}
 
 # Remove mitochondrial genes if you want to
-if(scConfig.remove_mito_genes == TRUE) {
-  MergeNorm_Combined_Seurat <- JoinLayers(MergeNorm_Combined_Seurat)
-  mito.genes <- grep(pattern = scConfig.mito_pattern, x = rownames(x = MergeNorm_Combined_Seurat@assays$RNA$counts), value = TRUE)
-  counts <- GetAssayData(MergeNorm_Combined_Seurat, assay = "RNA", layer = "counts")
-  counts <- counts[-(which(rownames(counts) %in% mito.genes)),]
-  MergeNorm_Combined_Seurat <- subset(MergeNorm_Combined_Seurat, features = rownames(counts))
-  MergeNorm_Combined_Seurat[["RNA"]] <- split(MergeNorm_Combined_Seurat[["RNA"]], f = MergeNorm_Combined_Seurat$Sample_name)
-  Layers(MergeNorm_Combined_Seurat)
+if (scConfig.remove_mito_genes == TRUE) {
+  mergenorm_combined_seurat <- JoinLayers(mergenorm_combined_seurat)
+  mito_genes <- grep(pattern = scConfig.mito_pattern, x = rownames(x = mergenorm_combined_seurat@assays$RNA$counts), value = TRUE)
+  counts <- GetAssayData(mergenorm_combined_seurat, assay = "RNA", layer = "counts")
+  counts <- counts[-(which(rownames(counts) %in% mito_genes)),]
+  mergenorm_combined_seurat <- subset(mergenorm_combined_seurat, features = rownames(counts))
+  mergenorm_combined_seurat[["RNA"]] <- split(mergenorm_combined_seurat[["RNA"]], f = mergenorm_combined_seurat$Sample_name)
+  Layers(mergenorm_combined_seurat)
   rm(counts)
 }
 
 # Run SCTransform and save the normalized Seurat object
-MergeNorm_Combined_Seurat <- SCTransform(MergeNorm_Combined_Seurat, verbose = TRUE, conserve.memory=TRUE)
-saveRDS(MergeNorm_Combined_Seurat, paste0("R_Data/",scConfig.Prefix ,"_combined_SCT.rds"))
+mergenorm_combined_seurat <- SCTransform(mergenorm_combined_seurat, verbose = TRUE, conserve.memory = TRUE)
+saveRDS(mergenorm_combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_SCT.rds"))
 
 # Log the completion time
-write(paste0("Merge_and_Normalize - Finish: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Merge_and_Normalize - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
