@@ -15,7 +15,7 @@ write(paste0("Make_Plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append
 file.copy("Scripts/Make_Plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Make_Plots.R"), overwrite = FALSE)
 
 # Load the configuration file
-source("SC_Experiment_config.R")
+source("sc_experiment_config.R")
 
 # Load the clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
@@ -84,29 +84,29 @@ dev.off()
 
 # Examine proportions
 #plot samples as proportion or percentage of cluster
-sample_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x=seurat_clusters, fill=Sample_name)) + 
+sample_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = seurat_clusters, fill = Sample_name)) +
   geom_bar(position = "fill") +
-  RotatedAxis() + 
+  RotatedAxis() +
   xlab("Sample Name")
 pdf("Plots/Quality_Control/Sample_prop_barPlot.pdf", height = 4, width = 6)
 print(sample_prop_bar_plot)
 dev.off()
 
 #Plot samples as proportion or percentage of cluster
-cluster_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x=Sample_name, fill=seurat_clusters)) + 
+cluster_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = Sample_name, fill = seurat_clusters)) +
   geom_bar(position = "fill") +
-  RotatedAxis() + 
+  RotatedAxis() +
   xlab("Sample Name")
 pdf("Plots/Quality_Control/Cluster_prop_barPlot.pdf", height = 4, width = 6)
 print(cluster_prop_bar_plot)
 dev.off()
 
 #plot proportions of each condition in each cluster
-cond_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x=seurat_clusters, fill=Treatment)) + 
-  geom_bar(position = "fill") + 
-  geom_hline(yintercept = 12/33, linetype = "dashed", size = 1) + 
-  geom_hline(yintercept = 22/33, linetype = "dashed", size = 1) +
-  RotatedAxis() + 
+cond_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = seurat_clusters, fill = Treatment)) +
+  geom_bar(position = "fill") +
+  geom_hline(yintercept = 12 / 33, linetype = "dashed", size = 1) +
+  geom_hline(yintercept = 22 / 33, linetype = "dashed", size = 1) +
+  RotatedAxis() +
   xlab("Sample Name")
 pdf("Plots/Quality_Control/Cond_prop_barPlot.pdf", height = 4, width = 6)
 print(cond_prop_bar_plot)
@@ -164,7 +164,7 @@ print(percent_ribo_vln_plot)
 dev.off()
 
 # Look at the marker genes identified by Seurat -------------
-all_markers <- read.csv("CSV_results/Marker_Genes_All/All_marker_genes.csv")
+all_markers <- read.csv("CSV_Results/Marker_Genes_All/All_marker_genes.csv")
 
 # Visualize the top marker gene expression in each cluster
 top_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 1, wt = avg_log2FC)
@@ -186,18 +186,18 @@ top2markers_diff_dotplot <- DotPlot(combined_seurat, features = unique(top_marke
 pdf("Plots/Clustering_Plots/Top2_Markers_diff_DotPlot.pdf", height = 8, width = 12)
 print(top2markers_diff_dotplot)
 dev.off()
-  
-  
+
+
 # Marker gene plots ----------------
 # Using markers from Dilly et al 2022 ---------------
 id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
                  "Ndrg2", "Slc1a2", "Slc4a4",
-                 "Slc17a7", "Satb1", "Neurod6","Vcan", 
-                 "Pdgfra", "Pcdh15", "Csf1r" , "Apbb1ip", "P2ry12", 
-                 "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153", 
-                 "Rsph1","Tmem212", "Rbfox3")
+                 "Slc17a7", "Satb1", "Neurod6", "Vcan",
+                 "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
+                 "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153",
+                 "Rsph1", "Tmem212", "Rbfox3")
 
-major_cells_dotplot <- DotPlot(combined_seurat, features = id_features)+RotatedAxis()
+major_cells_dotplot <- DotPlot(combined_seurat, features = id_features) + RotatedAxis()
 pdf("Plots/Clustering_Plots/Major_cells_dotplot.pdf")
 print(major_cells_dotplot)
 dev.off()
@@ -214,7 +214,7 @@ Cholinergic_Neurons <- c("Slc5a7", "Prima1")
 # Glia
 Astrocytes <- c("Slc1a2", "Slc1a3", "Ndrg2")
 Oligodendrocytes <- c("Mog", "Mobp", "Hapln2")
-Microglia <- c("Csf1r","Apbb1ip", "Inpp5d")
+Microglia <- c("Csf1r", "Apbb1ip", "Inpp5d")
 OPCs <- c("Vcan", "Pdgfra", "Pcdh15")
 Immature_Oligos <- c("Bmp4", "Cnp", "Tcf7l2") # - These might benefit from a more conservative name
 
@@ -223,17 +223,17 @@ Endothelial_Cells <- c("Flt1", "B2m", "Rgs5")
 Ependymal_Cells <- c("Ccdc153", "Rsph1", "Tmem212")
 
 # Lists for programming
-DS_cell_types <- c("Astrocytes", "Oligodendrocytes", "Microglia", "OPCs", 
-                      "Immature_Oligos", "All_Neurons", "Inhibitory_Neurons", "Excitatory_Neurons",
-                      "Cholinergic_Neurons", "Endothelial_Cells", "Ependymal_Cells")
+DS_cell_types <- c("Astrocytes", "Oligodendrocytes", "Microglia", "OPCs",
+                   "Immature_Oligos", "All_Neurons", "Inhibitory_Neurons", "Excitatory_Neurons",
+                   "Cholinergic_Neurons", "Endothelial_Cells", "Ependymal_Cells")
 
-major_marker_genes <- c(Astrocytes, Oligodendrocytes, Microglia, OPCs, 
+major_marker_genes <- c(Astrocytes, Oligodendrocytes, Microglia, OPCs,
                         Immature_Oligos, All_Neurons, Inhibitory_Neurons, Excitatory_Neurons,
                         Cholinergic_Neurons, Endothelial_Cells, Ependymal_Cells)
 
-major_marker_genes_unique <- unique(Major_marker_genes)
+major_marker_genes_unique <- unique(major_marker_genes)
 
-major_marker_genes_list <- list(Astrocytes, Oligodendrocytes, Microglia, OPCs, 
+major_marker_genes_list <- list(Astrocytes, Oligodendrocytes, Microglia, OPCs,
                                 Immature_Oligos, All_Neurons, Inhibitory_Neurons, Excitatory_Neurons,
                                 Cholinergic_Neurons, Endothelial_Cells, Ependymal_Cells)
 
@@ -255,13 +255,13 @@ Mural <- c("Pdgfrb", "Rgs5")
 Microglia <- c("C1qc", "Cx3cr1")
 
 DS_cell_types <- c(dSPN, iSPN, eSPN, PVALB_IN, Chol_IN,
-                   SST_IN, Astro, Oligo, OPC, Endo, 
+                   SST_IN, Astro, Oligo, OPC, Endo,
                    Ependy, Mural, Microglia)
 
 
 DS_marker_genes_list <- list(dSPN, iSPN, eSPN, PVALB_IN, Chol_IN,
-                   SST_IN, Astro, Oligo, OPC, Endo, 
-                   Ependy, Mural, Microglia)
+                             SST_IN, Astro, Oligo, OPC, Endo,
+                             Ependy, Mural, Microglia)
 
 DS_marker_genes_unique <- unique(DS_marker_genes_list)
 
@@ -271,7 +271,7 @@ pdf("Plots/Clustering_Plots/Clustered_UMAP.pdf", height = 6, width = 8)
 print(clustered_umap_plot)
 dev.off()
 
-all_markers_list <- c(Major_marker_genes_unique, DS_marker_genes_unique)
+all_markers_list <- c(major_marker_genes_unique, DS_marker_genes_unique)
 
 # Generate featureplots and violinplots for genes of interest
 for (marker in all_markers_list){

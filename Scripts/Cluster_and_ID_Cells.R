@@ -5,7 +5,6 @@
 library(here)
 library(dplyr)
 library(Seurat)
-library(patchwork)
 library(ggplot2)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
@@ -19,7 +18,7 @@ source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Load normalized data
-combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_SCT.rds"))
+combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
 
 # Get the number of cells per each sample
 cells_per_sample <- table(combined_seurat$Sample_name)

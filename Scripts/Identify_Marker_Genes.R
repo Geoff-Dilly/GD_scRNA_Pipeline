@@ -5,7 +5,6 @@
 library(here)
 library(dplyr)
 library(Seurat)
-library(patchwork)
 library(ggplot2)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
@@ -21,7 +20,6 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 # It is reccommended that you install the Presto package before running this script
 #> install.packages("devtools")
 #> devtools::install_github("immunogenomics/presto")
-
 
 # Load the previously clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
