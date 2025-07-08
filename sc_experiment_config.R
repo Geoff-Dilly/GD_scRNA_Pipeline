@@ -3,26 +3,27 @@
 
 # Project_name - Datatype: String
 # Name of the project for Seurat
-scConfig.Project_name <- "Chungus"
+scConfig.Project_name <- "GD_snRNA_Experiment"
 
 # Project_name - Datatype: String
 # Prefix for filenames of R objects
-scConfig.Prefix <- "Chungus"
+scConfig.Prefix <- "GD_snRNA"
 
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located
 # This is generally not needed but good to note
-scConfig.Home_folder <-   "/Users/gad479/Desktop/ChungDungular"
+scConfig.Home_folder <-   "__HOME_DIR__"
 
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data
 # Should contain data that can be read by the Read10X() function in Seurat
 # Data should be located at <Raw_data_folder>/<Sample_name>/<Sample_name>/outs/filtered_feature_bc_matrix
 # In order to run SoupX, .../unfiltered_feature_bc_matrix is also necessary
-scConfig.Raw_data_folder <- "/Users/gad479/Desktop/scRNA_pipeline_practice/Raw_Data"
+scConfig.Raw_data_folder <- "Raw_Data"
 
-# MT_pattern - Datatype: String
+# mito_pattern - Datatype: String
 # Str pattern that identifies mitochondrial genes
+# Mouse = "^mt-"; Rat = "^Mt-"; Human = "^MT-"
 scConfig.mito_pattern <- "^mt-"
 
 # ribo_pattern - Datatype: String
@@ -43,8 +44,8 @@ scConfig.percent_mito_cutoff <- 5
 # If TRUE doublets identified by DoubletFinder be removed prior to SCT normalization
 scConfig.remove_doublets <- FALSE
 
-# remove_Mt_genes - Datatype: Bool (TRUE/FALSE)
-# GD WARNING: AS OF NOW, SETTING THIS TRUE WILL BREAK THE CODE
+# remove_mito_genes - Datatype: Bool (TRUE/FALSE)
+# If TRUE mitochondrial genes will be removed prior to clustering
 scConfig.remove_mito_genes <- FALSE
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)

@@ -1,3 +1,2 @@
 Sample_name,Sex,Treatment
-A1,MF,Air
-E1,MF,Eth
+<sample>,<sex>,<treatment>
