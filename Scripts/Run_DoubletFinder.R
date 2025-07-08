@@ -2,76 +2,68 @@
 # Purpose: Run DoubletFinder on single sample Seurat objects
 # Author: Geoff Dilly
 
+library(here)
 library(Seurat)
 library(stringr)
 library(DoubletFinder)
-library(data.table)
-snRNA_home_dir <- "__HOME_DIR__"
+library(doParallel)
+library(foreach)
+snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Run_DoubletFinder - Start: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Run_DoubletFinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
 file.copy("Scripts/Run_DoubletFinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Run_DoubletFinder.R.R"), overwrite = FALSE)
 
 # Read the sample metadata file
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Setup parallel backend
+n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
+cl <- makeCluster(n_cores)
+registerDoParallel(cl)
+
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
-# Run doubletFinder ---------------------------------------------------------------------------------------
-for (sample_name in str_sample_list) {
-  # Pre-process Seurat object (standard)
-  GD_10x_Sample <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
+# Run doubletFinder --------------------
+# Parallel processing loop
+foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
+  sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
 
-  GD_10x_Sample <- NormalizeData(GD_10x_Sample)
-  GD_10x_Sample <- FindVariableFeatures(GD_10x_Sample, selection.method = "vst", nfeatures = 2000)
-  GD_10x_Sample <- ScaleData(GD_10x_Sample)
-  GD_10x_Sample <- RunPCA(GD_10x_Sample)
-  GD_10x_Sample <- RunUMAP(GD_10x_Sample, dims = 1:10)
+  sample_seurat <- NormalizeData(sample_seurat)
+  sample_seurat <- FindVariableFeatures(sample_seurat, selection.method = "vst", nfeatures = 2000)
+  sample_seurat <- ScaleData(sample_seurat)
+  sample_seurat <- RunPCA(sample_seurat)
+  sample_seurat <- RunUMAP(sample_seurat, dims = 1:10)
 
-  # pK Identification (no ground-truth)
-  sweep.res.list <- paramSweep(GD_10x_Sample, PCs = 1:10, sct = FALSE)
-  sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)
-  bcmvn <- find.pK(sweep.stats)
+  sweep_res_list <- paramSweep(sample_seurat, PCs = 1:10, sct = FALSE)
+  sweep_stats <- summarizeSweep(sweep_res_list, GT = FALSE)
+  bcmvn <- find.pK(sweep_stats)
 
-  pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop=T]))
-  print(pK_value)
+  pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
-  # Homotypic Doublet Proportion Estimate
-  homotypic.prop <- modelHomotypic(GD_10x_Sample@meta.data$Sample_name)           ## ex: annotations <- seu_kidney@meta.data$ClusteringResults
-  nExp_poi <- round(0.075*nrow(GD_10x_Sample@meta.data))  ## Assuming 7.5% doublet formation rate - tailor for your dataset
-  nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+  homotypic_prop <- modelHomotypic(sample_seurat@meta.data$Sample_name)
+  nExp_poi <- round(0.075 * nrow(sample_seurat@meta.data))
+  nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
-  # Run DoubletFinder
-  GD_10x_Sample <- doubletFinder(GD_10x_Sample, PCs = 1:10, pN = 0.25, pK = pK_value, nExp = nExp_poi, sct = FALSE)
-  
-  # Rename the doubletFinder results
-  meta_cols <- colnames(GD_10x_Sample@meta.data)
+  sample_seurat <- doubletFinder(sample_seurat, PCs = 1:10, pN = 0.25, pK = pK_value, nExp = nExp_poi, sct = FALSE)
+
+  meta_cols <- colnames(sample_seurat@meta.data)
   score <- str_subset(meta_cols, "^pANN")
   call <- str_subset(meta_cols, "^DF.cl")
-  GD_10x_Sample$Doublet_Score <- GD_10x_Sample[[score]]
-  GD_10x_Sample$Doublet_Call <- GD_10x_Sample[[call]]
-  GD_10x_Sample[[call]] <- NULL
-  GD_10x_Sample[[score]] <- NULL
-  
-  # Remove unnecessary data layers
-  GD_10x_Sample[["RNA"]]$scale.data <- NULL
-  GD_10x_Sample[["RNA"]]$data <- NULL
-  
-  # Save the Seurat object with doubletFinder Results
-  saveRDS(GD_10x_Sample, file = paste0("R_Data/", sample_name, "_seurat_Doublets.rds"))
+  sample_seurat$Doublet_Score <- sample_seurat[[score]]
+  sample_seurat$Doublet_Call <- sample_seurat[[call]]
+  sample_seurat[[call]] <- NULL
+  sample_seurat[[score]] <- NULL
 
+  sample_seurat[["RNA"]]$scale.data <- NULL
+  sample_seurat[["RNA"]]$data <- NULL
+
+  saveRDS(sample_seurat, file = paste0("R_Data/", sample_name, "_seurat_Doublets.rds"))
+  NULL
 }
 
-# Examine the results
-#!CeA_sample <- LoadSeuratRds("/Volumes/users/geoff_scratch/astrocyte_reanalysis/data/r_data/GD_2A_Alcohol_doublets.rds")
-#!DimPlot(CeA_sample)
-#!FeaturePlot(CeA_sample, features = "pANN_0.25_0.24_709", cols = c("blue", "yellow"), max.cutoff = 0.8)
-#!FeaturePlot(CeA_sample, features = "DF.classifications_0.25_0.24_709")
-#!doublet_freqs <- as.data.frame(table(CeA_sample@meta.data$DF.classifications_0.25_0.24_709))
-#!print(doublet_freqs)
-#!percentage_doublets <- doublet_freqs$Freq[1] / (doublet_freqs$Freq[2] + doublet_freqs$Freq[1])*100
-#!percentage_doublets
+stopCluster(cl)
 
 # Log the completion time
-write(paste0("Run_DoubletFinder - Finish: ", Sys.time()),file="snRNA_Log.txt", append = TRUE)
+write(paste0("Run_DoubletFinder - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

@@ -1,5 +1,10 @@
 # Ignore generated data and logs
-*.Rproj
-.Rhistory
-.RData
-.DS_Store
+R_Data/
+Raw_Data/
+Logs/
+Plots/
+CSV_Results/
+snRNA_Log.txt
+
+# Ignore home folder declaration
+analysis_home_dir.R
