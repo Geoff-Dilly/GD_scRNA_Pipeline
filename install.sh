@@ -26,11 +26,7 @@ mkdir -p "Plots/DESEQ_Plots/PCAs"
 mkdir -p "Plots/DESEQ_Plots/Volcano_Plots"
 mkdir -p "Plots/Quality_Control"
 mkdir -p "R_Data"
-mkdir -p "Scripts"
 mkdir -p "Logs"
-
-# Add .gitkeep to Scripts
-touch "Scripts/.gitkeep"
 
 # Create an r script that logs the home directory
 if [ ! -f "analysis_home_dir.R" ]; then
