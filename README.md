@@ -8,7 +8,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 ## Contents:
 
-- Install.sh
+- install.sh
 	Bash script to generate the recommended file structure in a local directory. 
 
 - R Scripts
@@ -20,7 +20,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 	- R configuration file to set pipeline parameters
 	- Metadata CSV file for identifying and labeling samples
 
-- Run_Analysis_Verbose.sh
+- run_pipeline.sh
 	Editable Bash script to run the R scripts in order
 
 - Directory Structure
@@ -46,7 +46,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 4. Run the analysis pipeline:
 
     ```shell
-    bash Run_Analysis_Verbose.sh
+    bash run_pipeline.sh
     ```
 
 5. Examine outputs:  
