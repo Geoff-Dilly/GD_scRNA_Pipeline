@@ -1,4 +1,4 @@
-# Single-cell analysis pipeline 
+# Single-cell Analysis Pipeline 
 
 ## Author: Geoff Dilly
 
