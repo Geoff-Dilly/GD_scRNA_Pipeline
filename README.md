@@ -29,13 +29,13 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 ## Usage:
 	1. Clone the repository
 
-	'''bash
+	'''sh
 	git clone https://github.com/Geoff-Dilly/GD_scRNA_Pipeline
 	cd <repo directory>
 	'''
 
 	2. Install file structure
-	'''bash
+	'''sh
 	bash install.sh
 	'''
 
@@ -43,7 +43,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 	Modify the configuration file and metadata CSV to match your data
 
 	4. Run the analysis pipeline
-	'''bash
+	'''sh
 	bash Run_Analysis_Verbose.sh
 	'''
 
