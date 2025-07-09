@@ -1,12 +1,12 @@
-#Single-cell analysis pipeline 
+# Single-cell analysis pipeline 
 
 ## Author: Geoff Dilly
 
-##Overview:
+## Overview:
 
 This repository provides a streamlined pipeline for analyzing 10x Chromium single-cell data using R and Seurat. The pipeline performs QC, clusters cells, identifies marker genes, and generates plots and CSV files in a recommended directory structure. This pipeline is intended for research in the Messing Lab at UT Austin, and can be adapted for similar use. 
 
-##Contents:
+## Contents:
 
 - Install.sh
 	Bash script to generate the recommended file structure in a local directory. 
@@ -26,7 +26,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - Directory Structure
 	Includes recommended folders for results, raw data, plots, and logs
 
-##Usage:
+## Usage:
 	1. Clone the repository
 
 	'''bash
@@ -50,5 +50,5 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 	5. Examine outputs
 	View plots, results, and logs
 
-##Acknowledgements:
+## Acknowledgements:
 This repository is maintained for current and future experiments in the Messing Lab at UT Austin. 
