@@ -96,7 +96,7 @@ As a table:
 
 As a CSV:
     
-    ```shell
+    ```
     Sample_name,Sex,Treatment,Age
     Subject_1,M,Drug,24
     Subject_2,F,Ctrl,27
