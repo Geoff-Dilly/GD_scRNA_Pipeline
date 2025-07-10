@@ -54,7 +54,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | 02_doubletfinder.R | Run DoubletFinder on each sample | Sample-level Seurat object |
 | 03_normalize_and_integrate.R | Integrate samples and normalize with scTransform | Experiment-level Seurat objects |
 | 04_cluster_cells.R | Perform dimensional reduction and clustering analysis | Experiment-level Seurat object |
-| 05_id_marker_genes.R | Identify marker genes by cluster | Experiment-level Seurat object |
+| 05_id_marker_genes.R | Identify marker genes by cluster | CSVs |
 | 05b_rename_clusters.R | *Optional:* Add cell type names to metadata | Experiment-level Seurat object |
 | 06_make_plots.R | Makes various plots | PDF plots |
 | 07_dge_1var.R | Differential gene expression analysis (1 variable: Treatment) | CSVs and PDF plots|
