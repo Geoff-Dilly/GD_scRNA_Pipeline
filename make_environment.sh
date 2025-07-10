@@ -27,7 +27,7 @@ conda install -y -n $ENV_NAME -c conda-forge r-seurat r-soupx r-doparallel
 
 # Install all required bioconductor packages
 conda install -y -n $ENV_NAME -c bioconda \
-bioconductor-dropletutils bioconductor-deseq2 bioconductor-glmgampoi \
+bioconductor-deseq2 bioconductor-glmgampoi \
 r-pheatmap
 
 # Activate the new environment

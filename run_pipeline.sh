@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Find the absolute path to the project directory and call it
-SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_HOME="$SCRIPTS_DIR/.." 
+PROJECT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$PROJECT_HOME"
 
 # Run the R scripts in order

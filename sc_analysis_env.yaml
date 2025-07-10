@@ -10,7 +10,6 @@ dependencies:
   - r-seurat
   - r-soupx
   - r-doparallel
-  - bioconductor-dropletutils
   - bioconductor-deseq2
   - bioconductor-glmgampoi
   - r-pheatmap

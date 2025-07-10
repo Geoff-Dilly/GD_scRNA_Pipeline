@@ -10,8 +10,8 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Cluster_and_ID_Cells - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Cluster_and_ID_Cells.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Cluster_and_ID_Cells.R"), overwrite = FALSE)
+write(paste0("04_cluster_cells - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/04_cluster_cells.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "04_cluster_cells.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -134,4 +134,4 @@ print(percent_mito_vln_by_animal)
 dev.off()
 
 # Log the completion time
-write(paste0("Cluster_and_ID_Cells - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("04_cluster_cells - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

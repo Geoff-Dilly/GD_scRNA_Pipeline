@@ -71,25 +71,26 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 ## Metadata Format
 
-- Metadata is a CSV that must contain three required columns: Sample_name, Sex, Treatment
+- Metadata is a CSV that must contain four required columns: Sample_name, Sex, Treatment, Raw_data_dir
+- Raw_data_dir should direct to the cellranger outs/ folder containing 
 - Additional columns are automatically read into the Seurat object as sample-level metadata
 
 **Example:**
 
-| Sample_name | Sex | Treatment | Age |
+| Sample_name | Sex | Treatment | Age | Raw_data_dir |
 |---|---|---|---|
-| Subject_1 | M | Drug | 24 |
-| Subject_2 | F | Ctrl | 27 |
-| Subject_3 | M | Ctrl | 27 |
-| Subject_4 | F | Drug | 26 |
+| Subject_1 | M | Drug | 24 | "Raw_Data/Subject_1/outs" |
+| Subject_2 | F | Ctrl | 27 | "Raw_Data/Subject_2/outs" |
+| Subject_3 | M | Ctrl | 27 | "Raw_Data/Subject_3/outs" |
+| Subject_4 | F | Drug | 26 | "Raw_Data/Subject_4/outs" |
 
 Saved as a CSV: 
 ```
 Sample_name,Sex,Treatment,Age
-Subject_1,M,Drug,24
-Subject_2,F,Ctrl,27
-Subject_3,M,Ctrl,27
-Subject_4,F,Ctrl,26
+Subject_1,M,Drug,24,"Raw_Data/Subject_1/outs"
+Subject_2,F,Ctrl,27,"Raw_Data/Subject_2/outs"
+Subject_3,M,Ctrl,27,"Raw_Data/Subject_3/outs"
+Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
 ```
 
 ## Requirements

@@ -9,8 +9,8 @@ set -e
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
-snRNA_home_dir=$(pwd)
-echo -e "\nSetting up scRNA analysis pipeline in: \n$snRNA_home_dir\n"
+scRNA_home_dir=$(pwd)
+echo -e "\nSetting up scRNA analysis pipeline in: \n$scRNA_home_dir\n"
 
 # Create the directories that the single-cell pipeline needs to run
 mkdir -p "CSV_Results/Cluster_Counts"
@@ -30,7 +30,7 @@ mkdir -p "Logs"
 
 # Create an r script that logs the home directory
 if [ ! -f "analysis_home_dir.R" ]; then
-echo 'snRNA_home_dir <- "'${snRNA_home_dir}'"' >> "analysis_home_dir.R"
+echo 'scRNA_home_dir <- "'${scRNA_home_dir}'"' >> "analysis_home_dir.R"
 fi
 
 # Set up config files if they don't already exist
@@ -43,16 +43,16 @@ fi
 
 if [ ! -f "sc_experiment_config.R" ]; then
 cat > sc_experiment_config.R <<'EOF'
-# Experiment configuration file for Messing/Mayfield snRNA-seq analysis using Seurat
+# Experiment configuration file for Messing/Mayfield scRNA-seq analysis using Seurat
 # Written by Geoffrey A. Dilly in June 2024
 
 # Project_name - Datatype: String
 # Name of the project for Seurat
-scConfig.Project_name <- "GD_snRNA_Experiment"
+scConfig.Project_name <- "GD_scRNA_Experiment"
 
 # Project_name - Datatype: String
 # Prefix for filenames of R objects
-scConfig.Prefix <- "GD_snRNA"
+scConfig.Prefix <- "GD_scRNA"
 
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located
@@ -107,6 +107,6 @@ scConfig.clustering_resolution <- 0.5
 EOF
 fi
 
-sed 's|"path/to/home/dir"|'"$snRNA_home_dir"'|' sc_experiment_config.R > temp && mv temp sc_experiment_config.R
+sed 's|"path/to/home/dir"|"'"$scRNA_home_dir"'"|' sc_experiment_config.R > temp && mv temp sc_experiment_config.R
 
 echo -e "\nSetup Complete"

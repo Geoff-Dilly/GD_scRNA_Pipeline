@@ -5,15 +5,14 @@
 library(here)
 library(Seurat)
 library(SoupX)
-library(DropletUtils)
 library(foreach)
 library(doParallel)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Run_SoupX - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Run_SoupX.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Run_SoupX.R"), overwrite = FALSE)
+write(paste0("01b_soupx - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("01b_soupx.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "01b_soupx"), overwrite = FALSE)
 
 # Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
 
@@ -30,14 +29,14 @@ registerDoParallel(cl)
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
 # Process each sample
-foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX", "DropletUtils")) %dopar% {
-  filt_matrix <- Read10X(paste0(scConfig.Raw_data_folder, "/", sample_name, "/", sample_name, "/outs/filtered_feature_bc_matrix"))
-  raw_matrix <- Read10X(paste0(scConfig.Raw_data_folder, "/", sample_name, "/", sample_name, "/outs/raw_feature_bc_matrix"))
-  str(raw_matrix)
-  str(filt_matrix)
+top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX")) %dopar% {
 
-  # Create a Seurat object with the filtered data
-  sample_seurat <- CreateSeuratObject(counts = filt_matrix)
+  # Read the sample Seurat object
+  sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
+
+  # Read the raw and filtered matrices for SoupX
+  filt_matrix <- Read10X(paste0(sample$Raw_data_dir, "filtered_feature_bc_matrix/"))
+  raw_matrix <- Read10X(paste0(sample$Raw_data_dir, "raw_feature_bc_matrix/"))
 
   # Cluster the Seurat object
   sample_seurat <- SCTransform(sample_seurat, verbose = TRUE)
@@ -56,20 +55,33 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX", "Droplet
   # Assign clustering to SoupX
   soup_channel <- setClusters(soup_channel, setNames(meta$seurat_clusters, rownames(meta)))
   soup_channel <- setDR(soup_channel, umap)
-  head(meta)
 
   # Estimate and apply the SoupX correction
   soup_channel <- autoEstCont(soup_channel)
   adj_matrix <- adjustCounts(soup_channel, roundToInt = TRUE)
 
-  # Display the top ambient RNA
-  head(soup_channel$soupProfile[order(soup_channel$soupProfile$est, decreasing = TRUE), ], n = 10)
+  # Add as new assay
+  sample_seurat[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
 
-  # Save the corrected matrix
-  write10xCounts(paste0("Raw_Data/", sample_name, "_filtered_feature_bc_matrix_SoupX_adjusted.h5"), adj_matrix)
+  # Sort soupProfile by estimated contamination and take the top 10
+  top_ambient <- head(soup_channel$soupProfile[order(soup_channel$soupProfile$est, decreasing = TRUE), ], n = 10)
+  top_ambient$Sample <- sample_name
 
-  NULL
+  # Reload the original Seurat object (before clustering/SCT/UMAP)
+  orig_seurat <- readRDS(paste0("R_Data/", sample_name, "_seurat.rds"))
+
+  # Add the SoupX assay
+  orig_seurat[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
+
+  # Save the Seurat object with SoupX results
+  saveRDS(orig_seurat, file = paste0("R_Data/", sample_name, "_seurat.rds"))
+
+  top_ambient
 }
 
+# Combine and write summary
+summary_df <- dplyr::bind_rows(top_ambient_genes)
+write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
+
 # Log the completion time
-write(paste0("Run_SoupX - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01b_soupx - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

@@ -12,8 +12,8 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Run_DoubletFinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Run_DoubletFinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Run_DoubletFinder.R.R"), overwrite = FALSE)
+write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/02_doubletfinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "02_doubletfinder.R"), overwrite = FALSE)
 
 # Read the sample metadata file
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
@@ -66,4 +66,4 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 stopCluster(cl)
 
 # Log the completion time
-write(paste0("Run_DoubletFinder - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

@@ -1,4 +1,4 @@
-# 06_make_plots.R
+# 06_06_make_plots.R
 # Purpose: Make various plots for single-cell analysis
 # Author: Geoff Dilly
 
@@ -11,8 +11,8 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Make_Plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Make_Plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Make_Plots.R"), overwrite = FALSE)
+write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/06_make_plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "06_make_plots.R"), overwrite = FALSE)
 
 # Load the configuration file
 source("sc_experiment_config.R")
@@ -20,7 +20,7 @@ source("sc_experiment_config.R")
 # Load the clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
-# Make all of the figures from previous scripts --------------
+# Make all of the figures from previous scripts ####
 
 # Check quality metrics for each cell
 qc_vlns_plot <- VlnPlot(combined_seurat, features = c("nFeature_RNA", "nCount_RNA", "percent_mito"), ncol = 3, pt.size = 0)
@@ -122,7 +122,7 @@ pdf("Plots/Quality_Control/Sex_prop_barPlot.pdf", height = 4, width = 6)
 print(sex_prop_bar_plot)
 dev.off()
 
-# Clustered QC plots ------------------
+# Clustered QC plots ####
 
 # Examine the clustered UMAP
 Idents(combined_seurat) <- combined_seurat$seurat_clusters
@@ -148,11 +148,6 @@ pdf("Plots/Quality_Control/nCount_Violin.pdf", height = 4, width = 8)
 print(nCount_vln_plot)
 dev.off()
 
-nCount_vln_plot <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0)
-pdf("Plots/Quality_Control/nCount_Violin.pdf", height = 4, width = 8)
-print(nCount_vln_plot)
-dev.off()
-
 doublet_score_vln_plot <- VlnPlot(combined_seurat, features = "Doublet_Score", pt.size = 0)
 pdf("Plots/Quality_Control/Doublet_Score_Violin.pdf", height = 4, width = 8)
 print(doublet_score_vln_plot)
@@ -163,7 +158,7 @@ pdf("Plots/Quality_Control/percent_ribo_Violin.pdf", height = 4, width = 8)
 print(percent_ribo_vln_plot)
 dev.off()
 
-# Look at the marker genes identified by Seurat -------------
+# Look at the marker genes identified by Seurat ####
 all_markers <- read.csv("CSV_Results/Marker_Genes_All/All_marker_genes.csv")
 
 # Visualize the top marker gene expression in each cluster
@@ -188,8 +183,8 @@ print(top2markers_diff_dotplot)
 dev.off()
 
 
-# Marker gene plots ----------------
-# Using markers from Dilly et al 2022 ---------------
+# Marker gene plots ####
+# Using markers from Dilly et al 2022 
 id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
                  "Ndrg2", "Slc1a2", "Slc4a4",
                  "Slc17a7", "Satb1", "Neurod6", "Vcan",
@@ -203,7 +198,7 @@ print(major_cells_dotplot)
 dev.off()
 
 # Relevant marker genes
-# Major Cell Types ---------------------
+# Major Cell Types ####
 
 # Neurons
 All_Neurons <- c("Rbfox3", "Syn1", "Gria1")
@@ -238,7 +233,7 @@ major_marker_genes_list <- list(Astrocytes, Oligodendrocytes, Microglia, OPCs,
                                 Cholinergic_Neurons, Endothelial_Cells, Ependymal_Cells)
 
 
-# DS Cell Subtypes ----------------------
+# DS Cell Subtypes ####
 # From
 dSPN <- c("Drd1", "Ebf1", "Pdyn") #Pdyn over Ebf1?
 iSPN <- c("Drd2", "Adora2a", "Penk")
@@ -265,8 +260,8 @@ DS_marker_genes_list <- list(dSPN, iSPN, eSPN, PVALB_IN, Chol_IN,
 
 DS_marker_genes_unique <- unique(DS_marker_genes_list)
 
-# Examine the resulting UMAP-------------
-clustered_umap_plot <- DimPlot(combined_seurat, label = TRUE)
+# Examine the resulting UMAP ####
+clustered_umap_plot_lbl <- DimPlot(combined_seurat, label = TRUE)
 pdf("Plots/Clustering_Plots/Clustered_UMAP.pdf", height = 6, width = 8)
 print(clustered_umap_plot)
 dev.off()
@@ -287,4 +282,4 @@ for (marker in all_markers_list){
 }
 
 # Log the completion time
-write(paste0("Make_Plots - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("06_make_plots - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

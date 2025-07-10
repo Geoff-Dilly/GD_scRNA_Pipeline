@@ -10,8 +10,8 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("Identify_Marker_Genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Identify_Marker_Genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Identify_Marker_Genes.R"), overwrite = FALSE)
+write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/05_id_marker_genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05_id_marker_genes.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -55,4 +55,4 @@ print(top2markers_dotplot)
 dev.off()
 
 # Log the completion time
-write(paste0("Identify_Marker_Genes - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05_id_marker_genes - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

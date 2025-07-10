@@ -27,7 +27,7 @@ scConfig.Raw_data_folder <- "Raw_Data"
 scConfig.mito_pattern <- "^mt-"
 
 # ribo_pattern - Datatype: String
-# Str pattern that identifies mitochondrial genes
+# Str pattern that identifies ribosomal genes
 scConfig.ribo_pattern <- "^Rp[ls]"
 
 # nFeature_RNA_cutoff - Datatype: Int 
@@ -47,6 +47,10 @@ scConfig.remove_doublets <- FALSE
 # remove_mito_genes - Datatype: Bool (TRUE/FALSE)
 # If TRUE mitochondrial genes will be removed prior to clustering
 scConfig.remove_mito_genes <- FALSE
+
+# remove_ribo_genes - Datatype: Bool (TRUE/FALSE)
+# If TRUE mitochondrial genes will be removed prior to clustering
+scConfig.remove_ribo_genes <- FALSE
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)
 # If TRUE the 25% of cells with the highest UMI count will be removed from the data

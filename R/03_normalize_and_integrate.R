@@ -8,8 +8,8 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 ## Log the start time and a timestamped copy of the script
-write(paste0("Merge_and_Normalize - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/Merge_and_Normalize.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "Merge_and_Normalize.R"), overwrite = FALSE)
+write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/03_normalize_and_integrate.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "03_normalize_and_integrate.R"), overwrite = FALSE)
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
 Sys.setenv("R_MAX_VSIZE" = 32000000000)
@@ -33,6 +33,7 @@ for (sample in str_sample_list) {
     sample_seurat <- subset(sample_seurat, subset = Doublet_Call == "Singlet")
   }
 
+  # Remove mitochondrial genes if specified
   if (scConfig.remove_mito_genes == TRUE) {
     mito_genes <- grep(scConfig.mito_pattern, rownames(sample_seurat), value = TRUE)
     sample_seurat <- subset(
@@ -40,6 +41,22 @@ for (sample in str_sample_list) {
       features = setdiff(rownames(sample_seurat), mito_genes)
     )
   }
+
+  # Remove ribosomal genes if specified
+  if (scConfig.remove_ribo_genes == TRUE) {
+    ribo_genes <- grep(scConfig.ribo_pattern, rownames(sample_seurat), value = TRUE)
+    sample_seurat <- subset(
+      sample_seurat,
+      features = setdiff(rownames(sample_seurat), ribo_genes)
+    )
+  }
+
+  # Remove the top quartile high UMI cells if specified
+  if (scConfig.remove_top_nUMIs == TRUE) {
+    umi_threshold <- quantile(sample_seurat$nCount_RNA, 0.75)
+    sample_seurat <- subset(sample_seurat, subset = nCount_RNA < umi_threshold)
+  }
+
   seurat_objects[[sample]] <- sample_seurat
 }
 
@@ -68,4 +85,4 @@ integrated_seurat <- IntegrateData(
 saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
 
 # Log the completion time
-write(paste0("Merge_and_Normalize - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

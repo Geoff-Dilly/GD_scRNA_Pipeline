@@ -1,2 +1,2 @@
-Sample_name,Sex,Treatment
-<sample>,<sex>,<treatment>
+Sample_name,Sex,Treatment, Raw_data_dir
+<sample>,<sex>,<treatment>,<path>

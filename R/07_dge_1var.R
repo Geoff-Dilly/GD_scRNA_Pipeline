@@ -13,10 +13,10 @@ library(pheatmap)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
-# Setup ===================
+# Setup ####
 # Log the start time and a time stamped copy of the script
-write(paste0("One_Var_DGE_Analysis - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/One_Var_DGE_Analysis.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "One_Var_DGE_Analysis.R"), overwrite = FALSE)
+write(paste0("07_dge_1var - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+file.copy("Scripts/07_dge_1var.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "07_dge_1var.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -27,10 +27,7 @@ n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores/2)
 registerDoParallel(cl)
 
-# Create the summary list to store DEG counts
-summary_list <- list()
-
-# Pseudobulking and data processing ===================
+# Pseudobulking and data processing ####
 # Load the clustered Seurat file
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 print(unique(combined_seurat$Sample_name))
@@ -49,10 +46,10 @@ colnames_vec <- colnames(pseudobulked_seurat$RNA)
 clusters <- unique(pseudobulked_seurat$seurat_clusters)
 conditions <- unique(pseudobulked_seurat$Treatment)
 
-# DGE Analysis and Plotting ===================
+# DGE Analysis and Plotting ####
 summary_list <- foreach(cluster = clusters,
                         .packages = c("Seurat", "DESeq2", "dplyr", "pheatmap", "ggrepel",
-                                      "magrittr", "tibble", "stringr", "ggplot2")) %dopar% {
+                                      "tibble", "stringr", "ggplot2")) %dopar% {
   # Find columns that end with the cluster ID
   cols <- grep(paste0("_", cluster, "$"), colnames_vec, value = TRUE)
 
@@ -107,8 +104,7 @@ summary_list <- foreach(cluster = clusters,
   plotDispEsts(dds)
   dev.off()
 
-  # contrast <- c("Treatment", levels(as.factor(cluster_metadata$Treatment))[2], levels(as.factor(cluster_metadata$Treatment))[1])
-  contrast <- c("Treatment", "Eth", "Air")
+  contrast <- c("Treatment", levels(as.factor(cluster_metadata$Treatment))[2], levels(as.factor(cluster_metadata$Treatment))[1])
 
   res <- results(dds,
                  contrast = contrast,
@@ -209,4 +205,4 @@ stopCluster(cl)
 summary_df <- dplyr::bind_rows(summary_list)
 write.csv(summary_df, "CSV_Results/DEGs_All/DGE_summary.csv", row.names = FALSE)
 
-write(paste0("One_Var_DGE_Analysis - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
