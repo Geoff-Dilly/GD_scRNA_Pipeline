@@ -1,6 +1,6 @@
 # Single-cell Analysis Pipeline 
 
-**Author:** Geoff Dilly  
+**Author:** Geoff Dilly, PhD  
 **Lab:** Messing Lab, UT Austin
 
 ## Overview
