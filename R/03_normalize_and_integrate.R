@@ -9,7 +9,7 @@ setwd(snRNA_home_dir)
 
 ## Log the start time and a timestamped copy of the script
 write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/03_normalize_and_integrate.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "03_normalize_and_integrate.R"), overwrite = FALSE)
+file.copy("R/03_normalize_and_integrate.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "03_normalize_and_integrate.R"), overwrite = FALSE)
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
 Sys.setenv("R_MAX_VSIZE" = 32000000000)

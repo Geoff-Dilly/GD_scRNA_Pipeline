@@ -13,7 +13,7 @@ setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/02_doubletfinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "02_doubletfinder.R"), overwrite = FALSE)
+file.copy("R/02_doubletfinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "02_doubletfinder.R"), overwrite = FALSE)
 
 # Read the sample metadata file
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")

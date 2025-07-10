@@ -12,7 +12,7 @@ setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/06_make_plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "06_make_plots.R"), overwrite = FALSE)
+file.copy("R/06_make_plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "06_make_plots.R"), overwrite = FALSE)
 
 # Load the configuration file
 source("sc_experiment_config.R")

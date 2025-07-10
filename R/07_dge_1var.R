@@ -16,7 +16,7 @@ setwd(snRNA_home_dir)
 # Setup ####
 # Log the start time and a time stamped copy of the script
 write(paste0("07_dge_1var - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/07_dge_1var.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "07_dge_1var.R"), overwrite = FALSE)
+file.copy("R/07_dge_1var.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "07_dge_1var.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")

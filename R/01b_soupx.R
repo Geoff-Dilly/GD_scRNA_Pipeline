@@ -12,7 +12,7 @@ setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("01b_soupx - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("01b_soupx.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "01b_soupx"), overwrite = FALSE)
+file.copy("R/01b_soupx.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "01b_soupx"), overwrite = FALSE)
 
 # Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
 

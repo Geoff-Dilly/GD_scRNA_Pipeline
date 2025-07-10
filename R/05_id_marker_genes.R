@@ -11,7 +11,7 @@ setwd(snRNA_home_dir)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("Scripts/05_id_marker_genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05_id_marker_genes.R"), overwrite = FALSE)
+file.copy("R/05_id_marker_genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05_id_marker_genes.R"), overwrite = FALSE)
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
