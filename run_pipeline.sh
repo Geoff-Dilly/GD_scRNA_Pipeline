@@ -5,12 +5,15 @@ SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_HOME="$SCRIPTS_DIR/.." 
 cd "$PROJECT_HOME"
 
-R --quiet --no-restore --file="Scripts/Load_10x_Data.R";
-#!R --quiet --no-restore --file="Scripts/Run_SoupX.R";
-R --quiet --no-restore --file="Scripts/Run_DoubletFinder.R";
-R --quiet --no-restore --file="Scripts/Merge_and_Normalize.R";
-R --quiet --no-restore --file="Scripts/Cluster_and_ID_Cells.R"; 
-R --quiet --no-restore --file="Scripts/Identify_Marker_Genes.R";
-#!R --quiet --no-restore --file="Scripts/Rename_Clusters.R";
-R --quiet --no-restore --file="Scripts/Make_Plots.R";
-#!R --quiet --no-restore --file="Scripts/One_Var_DGE_Analysis.R";
+# Run the R scripts in order
+# Completed or optional scripts can commented out
+
+R --quiet --no-restore --file="R/01_load_data.R";
+#R --quiet --no-restore --file="R/01b_soupx.R";
+R --quiet --no-restore --file="R/02_doubletfinder.R";
+R --quiet --no-restore --file="R/03_normalize_and_integrate.R";
+R --quiet --no-restore --file="R/04_cluster_cells.R"; 
+R --quiet --no-restore --file="R/05_id_marker_genes.R";
+#R --quiet --no-restore --file="R/05b_rename_clusters.R";
+R --quiet --no-restore --file="R/06_make_plots.R";
+#R --quiet --no-restore --file="R/07_dge_1var.R";
