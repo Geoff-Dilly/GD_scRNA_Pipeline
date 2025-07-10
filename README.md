@@ -1,6 +1,6 @@
 # Single-cell Analysis Pipeline 
 
-**Author:** Geoff Dilly
+**Author:** Geoff Dilly  
 **Lab:** Messing Lab, UT Austin
 
 ## Overview
@@ -83,8 +83,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | Subject_3 | M | Ctrl | 27 |
 | Subject_4 | F | Drug | 26 |
 
-Saved as a CSV:
-    
+Saved as a CSV: 
 ```
 Sample_name,Sex,Treatment,Age
 Subject_1,M,Drug,24
@@ -96,6 +95,7 @@ Subject_4,F,Ctrl,26
 ## Requirements
 
 - R 4.3.3
+- Seurat ≥ 5.0
 - Anaconda
 - See `make_environment.sh` or `sc_analysis_env.yaml` for environment setup.
 
