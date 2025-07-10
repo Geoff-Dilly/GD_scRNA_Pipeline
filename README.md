@@ -27,6 +27,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 	Includes recommended folders for results, raw data, plots, and logs
 
 ## Usage:
+
 1. Clone the repository:
 
     ```shell
@@ -74,6 +75,15 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | 06_make_plots.R | Makes various plots | Plots as PDFs |
 | 07_dge_1var.R | Differential gene expression analysis (1 variable) | CSVs and Plots as PDFs |
 
+## Directory Structure
+
+- `Raw_Data` — Raw input files (fastq, count matrices, etc.)
+- `R_Data/` — RDS files of Seurat objects at each stage
+- `Plots/` — Output figures and QC plots
+- `CSV_Results` - CSVs of cell counts, markers, and DGE results
+- `Logs/` — Run logs and script backups
+- `R/` — R scripts
+
 
 ## Metadata Format:
 
@@ -105,4 +115,5 @@ Subject_4,F,Ctrl,26
 ```
 
 ## Acknowledgements:
+
 This repository is maintained for current and future experiments in the Messing Lab at UT Austin. 
