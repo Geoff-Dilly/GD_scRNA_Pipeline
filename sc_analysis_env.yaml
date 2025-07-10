@@ -1,0 +1,25 @@
+name: sc_analysis_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base=4.3.3
+  - r-essentials
+  - r-devtools
+  - r-seurat
+  - r-soupx
+  - r-doparallel
+  - bioconductor-dropletutils
+  - bioconductor-deseq2
+  - bioconductor-glmgampoi
+  - r-pheatmap
+  - r-tidyverse
+  - r-ggplot2
+  - r-patchwork
+  - r-ggrepel
+
+# Two packages need to be installed from GitHub after environment creation
+# After activating your environment, run:
+# Rscript -e 'devtools::install_github("chris-mcginnis-ucsf/DoubletFinder")'
+# Rscript -e 'devtools::install_github("immunogenomics/presto")'
