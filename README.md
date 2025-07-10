@@ -96,13 +96,13 @@ As a table:
 
 As a CSV:
     
-    ```
-    Sample_name,Sex,Treatment,Age
-    Subject_1,M,Drug,24
-    Subject_2,F,Ctrl,27
-    Subject_3,M,Ctrl,27
-    Subject_4,F,Ctrl,26
-    ```
+```
+Sample_name,Sex,Treatment,Age
+Subject_1,M,Drug,24
+Subject_2,F,Ctrl,27
+Subject_3,M,Ctrl,27
+Subject_4,F,Ctrl,26
+```
 
 ## Acknowledgements:
 This repository is maintained for current and future experiments in the Messing Lab at UT Austin. 
