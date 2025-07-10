@@ -54,9 +54,9 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 ## Scripts:
 
-### Bash Scripts
+### Bash Scripts:
 | Script | Description |
-|---|---|---|
+|---|---|
 | install.sh | Generate the recommended file structure | 
 | make_environment.sh | Creates an Anaconda environment | 
 | run_pipeline.sh | Run the R scripts in order | 
