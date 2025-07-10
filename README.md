@@ -94,7 +94,7 @@ Subject_4,F,Ctrl,26
 
 ## Requirements
 
-- R 4.3.3
+- R = 4.3.3
 - Seurat ≥ 5.0
 - Anaconda
 - See `make_environment.sh` or `sc_analysis_env.yaml` for environment setup.
