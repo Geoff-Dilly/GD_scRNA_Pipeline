@@ -66,12 +66,12 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | Script | Description | Output |
 |---|---|---|
 | 01_load_data.R | Load sample data, metadata, and basic QC | Sample-level seurat object |
-| 01b_soupx.R | *Optional* Run SoupX on each sample | Sample-level seurat object *Optional*|
+| 01b_soupx.R | *Optional:* Run SoupX on each sample | Sample-level seurat object *Optional*|
 | 02_doubletfinder.R | Run DoubletFinder on each sample | Sample-level seurat object |
 | 03_normalize_and_integrate.R | Integrate samples and normalize with scTransform | Experiment-level seurat objects |
 | 04_cluster_cells.R | Perform dim reduction and clustering analysis | Experiment-level seurat object |
 | 05_id_marker_genes.R | Identify marker genes by cluster | Experiment-level seurat object |
-| 05b_rename_clusters.R | *Optional* Add cell type names to metadata | Experiment-level seurat object |
+| 05b_rename_clusters.R | *Optional:* Add cell type names to metadata | Experiment-level seurat object |
 | 06_make_plots.R | Makes various plots | Plots as PDFs |
 | 07_dge_1var.R | Differential gene expression analysis (1 variable) | CSVs and Plots as PDFs |
 
