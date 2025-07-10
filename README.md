@@ -78,7 +78,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 **Example:**
 
 | Sample_name | Sex | Treatment | Age | Raw_data_dir |
-|---|---|---|---|
+|---|---|---|---|---|
 | Subject_1 | M | Drug | 24 | "Raw_Data/Subject_1/outs" |
 | Subject_2 | F | Ctrl | 27 | "Raw_Data/Subject_2/outs" |
 | Subject_3 | M | Ctrl | 27 | "Raw_Data/Subject_3/outs" |
