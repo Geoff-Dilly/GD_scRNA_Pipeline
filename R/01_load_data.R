@@ -42,7 +42,7 @@ registerDoParallel(cl)
 sample_list <- split(scConfig.Sample_metadata, seq_len(nrow(scConfig.Sample_metadata)))
 
 foreach(sample = sample_list, .packages = c("Seurat")) %dopar% {
-  sample_seurat_data <- Read10X(paste0(sample$Raw_data_dir, "filtered_feature_bc_matrix/"))
+  sample_seurat_data <- Read10X(paste0(sample$Raw_data_dir, "/filtered_feature_bc_matrix"))
   sample_seurat <- CreateSeuratObject(counts = sample_seurat_data, project = scConfig.Project_name, min.cells = 1, min.features = 1)
   sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.mito_pattern, col.name = "percent_mito")
   sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.ribo_pattern, col.name = "percent_ribo")

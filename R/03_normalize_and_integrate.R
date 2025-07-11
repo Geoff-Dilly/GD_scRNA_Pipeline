@@ -28,7 +28,7 @@ seurat_objects <- list()
 for (sample in str_sample_list) {
   sample_seurat <- readRDS(paste0("R_Data/", sample, "_seurat_Doublets.rds"))
 
-  # Remove called doublets if you want to
+  # Remove called doublets if specified
   if (scConfig.remove_doublets == TRUE) {
     sample_seurat <- subset(sample_seurat, subset = Doublet_Call == "Singlet")
   }

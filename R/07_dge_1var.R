@@ -76,45 +76,32 @@ summary_list <- foreach(cluster = clusters,
   rld <- rlog(dds, blind = TRUE)
 
   # Plot PCAs by condition and sample
-  plot1 <- DESeq2::plotPCA(rld, intgroup = "Treatment", ntop = 50)
+  pca_plot_by_condition <- DESeq2::plotPCA(rld, intgroup = "Treatment", ntop = 50)
+  save_plot_pdf(pca_plot_by_condition, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_PCA.pdf"),
+                height = 6, width = 8)
 
-  pdf(paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_PCA.pdf"))
-  print(plot1)
-  dev.off()
-
-  plot2 <- DESeq2::plotPCA(rld, intgroup = "Sample_name", ntop = 50)
-
-  pdf(paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_sample_PCA.pdf"))
-  print(plot2)
-  dev.off()
+  pca_plot_by_sample <- DESeq2::plotPCA(rld, intgroup = "Sample_name", ntop = 50)
+  save_plot_pdf(pca_plot_by_sample, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_sample_PCA.pdf"),
+                height = 6, width = 8)
 
   # Extract the rlog matrix from the object and compute pairwise correlation values
   rld_mat <- assay(rld)
   rld_cor <- cor(rld_mat)
 
   # Plot heatmap
-  pdf(paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"))
-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
-  dev.off()
+  cluster_heatmap <-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
+  save_plot_pdf(cluster_heatmap, paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"), 
+                height = 6, width = 8)
 
   # Plot dispersion estimates
-  plotDispEsts(dds)
+  dispersion_plot <- plotDispEsts(dds)
+  save_plot_pdf(dispersion_plot, paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"), 
+                height = 6, width = 8)
 
-  pdf(paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"))
-  plotDispEsts(dds)
-  dev.off()
-
+  # Set up the contrast for DESeq2, run DGE, and apply LFC shrinkage
   contrast <- c("Treatment", levels(as.factor(cluster_metadata$Treatment))[2], levels(as.factor(cluster_metadata$Treatment))[1])
-
-  res <- results(dds,
-                 contrast = contrast,
-                 alpha = 0.05)
-
-  res <- lfcShrink(dds,
-                   contrast =  contrast,
-                   res = res, type = "normal")
-
-  print(summary(res))
+  res <- results(dds, contrast = contrast, alpha = 0.05)
+  res <- lfcShrink(dds, contrast =  contrast, res = res, type = "normal")
 
   # Turn the results object into a tibble for use with tidyverse functions
   res_tbl <- res %>%
@@ -184,15 +171,14 @@ summary_list <- foreach(cluster = clusters,
           plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25)))
 
-
-  pdf(paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"))
-  print(volc_plot)
-  dev.off()
+  # Save the volcano plot
+  save_plot_pdf(volc_plot, paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"), 
+                height = 6, width = 8)
 
   # Make an MA plot for quality control
-  pdf(paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"))
-  plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
-  dev.off()
+  ma_plot <- plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
+  save_plot_pdf(ma_plot, paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"), 
+                height = 6, width = 8)
 
   # Return the summary
   summary

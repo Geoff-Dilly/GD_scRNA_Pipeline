@@ -44,9 +44,9 @@ elbow_plot <- ElbowPlot(combined_seurat, ndims = 100)
 pdf("Plots/Quality_Control/Elbowplot.pdf")
 print(elbow_plot)
 dev.off()
-# I chose 25 PCs
 
 # Perform UMAP dimensional reduction on the data
+# Default is 25 dimensions
 combined_seurat <- RunUMAP(combined_seurat, reduction = "pca", dims = 1:25)
 
 # Examine the resulting UMAP-------------
@@ -63,7 +63,6 @@ dev.off()
 
 # Perform clustering -----------------------
 # Identifies clusters of cells within the UMAP
-# resolutions and dims values were found in Eric's paper
 combined_seurat <- FindNeighbors(combined_seurat, reduction = "pca", dims = 1:25)
 combined_seurat <- FindClusters(combined_seurat, resolution = scConfig.clustering_resolution)
 
@@ -102,7 +101,7 @@ print(doublet_score_vln_plot)
 dev.off()
 
 # Visualize marker gene expression in each cluster
-# Using markers from my paper
+# Using markers from Dilly et al. 2022
 id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
                  "Ndrg2", "Slc1a2", "Slc4a4",
                  "Slc17a7", "Satb1", "Neurod6", "Vcan",

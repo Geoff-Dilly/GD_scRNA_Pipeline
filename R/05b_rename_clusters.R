@@ -19,8 +19,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
 # Rename each Seurat cluster
-# Note: You will have to manually edit this field to the correct length
-# Running this script will substantially increase the size of the Seurat object
+# Note: Manually edit this field to the correct length
 combined_seurat <- RenameIdents(object = combined_seurat,
                                 "0" = "Cluster_0",
                                 "1" = "Cluster_1",
