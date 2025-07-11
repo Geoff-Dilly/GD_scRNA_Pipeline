@@ -5,7 +5,7 @@
 
 ## Overview
 
-This repository provides a streamlined pipeline for analyzing 10x Chromium single-cell data using R and Seurat. The pipeline performs QC, clusters cells, identifies marker genes, and generates plots and CSV files in a recommended directory structure. This pipeline is intended for research in the Messing Lab at UT Austin, and can be adapted for similar use. 
+This repository provides a streamlined pipeline for analyzing 10x Chromium single-cell data using R and Seurat. The pipeline performs QC, clusters cells, identifies marker genes, and generates plots and CSV files in a recommended directory structure. This pipeline is intended for neuroscience research in the Messing Lab at UT Austin, and can be adapted for similar use. 
 
 ## Contents
 
@@ -54,7 +54,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | 02_doubletfinder.R | Run DoubletFinder on each sample | Sample-level Seurat object |
 | 03_normalize_and_integrate.R | Integrate samples and normalize with scTransform | Experiment-level Seurat objects |
 | 04_cluster_cells.R | Perform dimensional reduction and clustering analysis | Experiment-level Seurat object |
-| 05_id_marker_genes.R | Identify marker genes by cluster | Experiment-level Seurat object |
+| 05_id_marker_genes.R | Identify marker genes by cluster | CSVs |
 | 05b_rename_clusters.R | *Optional:* Add cell type names to metadata | Experiment-level Seurat object |
 | 06_make_plots.R | Makes various plots | PDF plots |
 | 07_dge_1var.R | Differential gene expression analysis (1 variable: Treatment) | CSVs and PDF plots|
@@ -72,7 +72,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 ## Metadata Format
 
 - Metadata is a CSV that must contain four required columns: Sample_name, Sex, Treatment, Raw_data_dir
-- Raw_data_dir should direct to the cellranger outs/ folder containing 
+- Raw_data_dir should direct to the cellranger outs/ folder containing `filtered_feature_bc_matrix/`
 - Additional columns are automatically read into the Seurat object as sample-level metadata
 
 **Example:**
