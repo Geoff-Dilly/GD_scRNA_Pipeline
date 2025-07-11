@@ -72,7 +72,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 ## Metadata Format
 
 - Metadata is a CSV that must contain four required columns: Sample_name, Sex, Treatment, Raw_data_dir
-- Raw_data_dir should direct to the cellranger outs/ folder containing 
+- Raw_data_dir should direct to the cellranger outs/ folder containing `filtered_feature_bc_matrix/`
 - Additional columns are automatically read into the Seurat object as sample-level metadata
 
 **Example:**
