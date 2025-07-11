@@ -9,6 +9,9 @@ library(ggplot2)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Load custom functions
+source("R/modules/plot_utils.R")
+
 # Log the start time and a timestamped copy of the script
 write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
 file.copy("R/05_id_marker_genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05_id_marker_genes.R"), overwrite = FALSE)
@@ -43,16 +46,12 @@ write.csv(top10_cell_type_markers, "CSV_Results/Marker_Genes_All/Marker_Genes_To
 # Visualize the top marker gene in each cluster
 top_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 1, wt = avg_log2FC)
 topmarker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()
-pdf("Plots/Clustering_Plots/Top_Marker_DotPlot.pdf", height = 8, width = 12)
-print(topmarker_dotplot)
-dev.off()
+save_plot_pdf(topmarker_dotplot, "Plots/Clustering_Plots/Top_Markers_DotPlot.pdf", height = 8, width = 12)
 
 # Visualize the top 2 marker genes in each cluster
 top_markers2 <- all_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
-pdf("Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 8, width = 12)
-print(top2markers_dotplot)
-dev.off()
+save_plot_pdf(top2markers_dotplot, "Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 8, width = 12)
 
 # Log the completion time
 write(paste0("05_id_marker_genes - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

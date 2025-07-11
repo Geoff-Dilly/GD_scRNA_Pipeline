@@ -13,7 +13,9 @@ library(pheatmap)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
-# Setup ####
+# Load custom functions
+source("R/modules/plot_utils.R")
+
 # Log the start time and a time stamped copy of the script
 write(paste0("07_dge_1var - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
 file.copy("R/07_dge_1var.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "07_dge_1var.R"), overwrite = FALSE)

@@ -11,13 +11,7 @@ snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
 # Load custom functions
-
-# Saves a ggplot object to a PDF file with specified dimensions.
-save_plot_pdf <- function(plot, filename, height = 4, width = 6) {
-  pdf(filename, height = height, width = width)
-  print(plot)
-  dev.off()
-}
+source("R/modules/plot_utils.R")
 
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
