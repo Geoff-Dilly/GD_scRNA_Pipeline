@@ -84,7 +84,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | Subject_3 | M | Ctrl | 27 | "Raw_Data/Subject_3/outs" |
 | Subject_4 | F | Drug | 26 | "Raw_Data/Subject_4/outs" |
 
-Saved as a CSV: 
+**Saved as a CSV:**
 ```
 Sample_name,Sex,Treatment,Age,Raw_data_dir
 Subject_1,M,Drug,24,"Raw_Data/Subject_1/outs"

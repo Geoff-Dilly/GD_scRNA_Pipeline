@@ -34,8 +34,17 @@ registerDoParallel(cl)
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 print(unique(combined_seurat$Sample_name))
 
+# Select the assay for DESeq2 analysis
+if (scConfig.soupx_adjust == TRUE) {
+  # If SoupX was used, set the default assay to SoupX
+  dge_assay <- "SoupX"
+} else {
+  # If SoupX was not used, use RNA
+  dge_assay <- "RNA"
+}
+
 # Create pseudobulked seurat object
-pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = "RNA", return.seurat = TRUE,
+pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = dge_assay, return.seurat = TRUE,
                                            group.by = c("Treatment", "Sample_name", "seurat_clusters"))
 
 pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat$seurat_clusters, sep = "_")
