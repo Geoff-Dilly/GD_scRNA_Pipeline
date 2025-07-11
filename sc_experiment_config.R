@@ -40,6 +40,10 @@ scConfig.nFeature_RNA_cutoff <- 200
 # Recommended = 5
 scConfig.percent_mito_cutoff <- 5
 
+# soupx_adjust - Datatype: Bool (TRUE/FALSE)
+# If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
+scConfig.soupx_adjust <- FALSE
+
 # remove_doublets - Datatype: Bool (TRUE/FALSE)
 # If TRUE doublets identified by DoubletFinder be removed prior to SCT normalization
 scConfig.remove_doublets <- FALSE
