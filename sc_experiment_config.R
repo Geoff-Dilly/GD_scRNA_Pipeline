@@ -58,7 +58,7 @@ scConfig.remove_doublets <- FALSE
 scConfig.remove_mito_genes <- FALSE
 
 # remove_ribo_genes - Datatype: Bool (TRUE/FALSE)
-# If TRUE mitochondrial genes will be removed prior to clustering
+# If TRUE ribosomal genes will be removed prior to clustering
 scConfig.remove_ribo_genes <- FALSE
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)
