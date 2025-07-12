@@ -14,12 +14,15 @@ write_script_log <- function(script_file) {
   # Write the script to the log file
   writeLines(paste("Script Log:\n"), log_connection)
   writeLines(readLines(script_file), log_connection)
+  writeLines("\n====================================================================\n", log_connection)
 
   # Write the configuration file and session info
-  writeLines(paste("\nConfig Log:\n"), log_connection)
+  writeLines(paste("Config Log:\n"), log_connection)
   writeLines(readLines(config_file), log_connection)
+  writeLines("\n====================================================================\n", log_connection)
 
-  writeLines("\nSession info:\n", log_connection)
+
+  writeLines("Session info:\n", log_connection)
   capture.output(sessionInfo(), file = log_connection)
 
   # Close the log file connection
