@@ -40,6 +40,11 @@ scConfig.nFeature_RNA_cutoff <- 200
 # Recommended = 5
 scConfig.percent_mito_cutoff <- 5
 
+# percent_ribo_cutoff - Datatype: Int
+# Maximum percentage of ribosomal reads to include cell
+# Recommended = 5
+scConfig.percent_ribo_cutoff <- 5
+
 # soupx_adjust - Datatype: Bool (TRUE/FALSE)
 # If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
 scConfig.soupx_adjust <- FALSE

@@ -49,7 +49,9 @@ foreach(sample = sample_list, .packages = c("Seurat")) %dopar% {
   sample_seurat <- CreateSeuratObject(counts = sample_seurat_data, project = scConfig.Project_name, min.cells = 1, min.features = 1)
   sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.mito_pattern, col.name = "percent_mito")
   sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.ribo_pattern, col.name = "percent_ribo")
-  sample_seurat <- subset(sample_seurat, subset = nFeature_RNA > scConfig.nFeature_RNA_cutoff & percent_mito < scConfig.percent_mito_cutoff)
+  sample_seurat <- subset(sample_seurat, subset = nFeature_RNA > scConfig.nFeature_RNA_cutoff &
+                                                  percent_mito < scConfig.percent_mito_cutoff &
+                                                  percent_ribo < scConfig.percent_ribo_cutoff)
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
