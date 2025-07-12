@@ -13,6 +13,7 @@ library(pheatmap)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")

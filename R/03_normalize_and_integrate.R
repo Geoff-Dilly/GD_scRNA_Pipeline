@@ -7,6 +7,7 @@ library(Seurat)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
@@ -27,6 +28,7 @@ str_sample_list <- scConfig.Sample_metadata$Sample_name
 # Initialize a list to store the Seurat objects
 seurat_objects <- list()
 
+# Filter data ####
 # Read RDS files and assign them to variables dynamically
 for (sample in str_sample_list) {
   sample_seurat <- readRDS(paste0("R_Data/", sample, "_seurat_Doublets.rds"))
@@ -67,11 +69,12 @@ for (sample in str_sample_list) {
   seurat_objects[[sample]] <- sample_seurat
 }
 
-# Normalize with SCTransform (use "v5" parameters if desired)
+# Normalize with SCTransform ####
 seurat_objects <- lapply(seurat_objects, function(obj) {
   SCTransform(obj, assay = "RNA", verbose = TRUE)
 })
 
+# Integrate the datasets ####
 # Select integration features
 features <- SelectIntegrationFeatures(object.list = seurat_objects, nfeatures = 3000)
 

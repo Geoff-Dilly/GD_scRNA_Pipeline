@@ -11,6 +11,7 @@ library(doParallel)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
@@ -27,11 +28,13 @@ n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
+# Data Preprocessing ####
 # Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
 # Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
 
+# Run SoupX ####
 # Process each sample
 top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX")) %dopar% {
 

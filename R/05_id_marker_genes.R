@@ -9,6 +9,7 @@ library(ggplot2)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
@@ -28,6 +29,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 # Load the previously clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
+# Find marker genes and save results ####
 # Identify markers for each cluster
 combined_seurat <- PrepSCTFindMarkers(combined_seurat)
 all_markers <- FindAllMarkers(object = combined_seurat)
@@ -44,6 +46,7 @@ write.csv(top30_cell_type_markers, "CSV_Results/Marker_Genes_All/Marker_Genes_To
 top10_cell_type_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
 write.csv(top10_cell_type_markers, "CSV_Results/Marker_Genes_All/Marker_Genes_Top10.csv")
 
+# Make plots ####
 # Visualize the top marker gene in each cluster
 top_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 1, wt = avg_log2FC)
 topmarker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()

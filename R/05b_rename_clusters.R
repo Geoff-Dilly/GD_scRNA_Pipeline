@@ -7,6 +7,7 @@ library(Seurat)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 write_script_log("R/05b_rename_clusters.R")
@@ -22,7 +23,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 # Load clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
-# Rename each Seurat cluster
+# Rename Seurat clusters ####
 # Note: Manually edit this field to the correct length
 combined_seurat <- RenameIdents(object = combined_seurat,
                                 "0" = "Cluster_0",

@@ -9,6 +9,7 @@ library(doParallel)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
@@ -19,6 +20,11 @@ write_script_log("R/01_load_data.R")
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
+# Setup parallel backend
+n_cores <- parallel::detectCores() - 1
+cl <- makeCluster(n_cores / 2)
+registerDoParallel(cl)
 
 # Check for required metadata columns
 if (!("Sample_name" %in% colnames(scConfig.Sample_metadata))) {
@@ -37,11 +43,7 @@ if (!("Raw_data_dir" %in% colnames(scConfig.Sample_metadata))) {
   stop("Mandatory metadata column <Raw_data_dir> is not present")
 }
 
-# Setup parallel backend
-n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores / 2)
-registerDoParallel(cl)
-
+# Load data ####
 sample_list <- split(scConfig.Sample_metadata, seq_len(nrow(scConfig.Sample_metadata)))
 
 foreach(sample = sample_list, .packages = c("Seurat")) %dopar% {
@@ -60,5 +62,6 @@ foreach(sample = sample_list, .packages = c("Seurat")) %dopar% {
 }
 
 stopCluster(cl)
+
 # Log the completion time
 write(paste0("01_load_data - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)

@@ -10,6 +10,7 @@ library(ggplot2)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
@@ -200,22 +201,22 @@ for (marker in all_markers_list){
 
 # Make a stacked violin plot for the DS marker genes
 mkr_stack_vln_plot <- make_stacked_vln_plot(seurat_obj = combined_seurat,
-                                             features = unique(top_markers2$gene),
-                                             assay = "SCT",
-                                             slot = "data",
-                                             adjust = 2.5,
-                                             pt.size = 0,
-                                             gene_label_size = 8)
+                                            features = unique(top_markers2$gene),
+                                            assay = "SCT",
+                                            slot = "data",
+                                            adjust = 2.5,
+                                            pt.size = 0,
+                                            gene_label_size = 8)
 save_plot_pdf(mkr_stack_vln_plot, "Plots/Clustering_Plots/topmkr_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Make a stacked violin plot for the DS marker genes
 mkr_stack_vln_plot <- make_stacked_vln_plot(seurat_obj = combined_seurat,
-                                             features = DS_marker_genes_unique,
-                                             assay = "SCT",
-                                             slot = "data",
-                                             adjust = 2.5,
-                                             pt.size = 0,
-                                             gene_label_size = 8)
+                                            features = DS_marker_genes_unique,
+                                            assay = "SCT",
+                                            slot = "data",
+                                            adjust = 2.5,
+                                            pt.size = 0,
+                                            gene_label_size = 8)
 save_plot_pdf(mkr_stack_vln_plot, "Plots/Clustering_Plots/marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Log the completion time

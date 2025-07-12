@@ -11,6 +11,7 @@ library(foreach)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Setup ####
 # Load custom functions
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
@@ -27,10 +28,11 @@ n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
+# Run doubletFinder ####
+# Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
-# Run doubletFinder --------------------
-# Parallel processing loop
+# Run doubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
   sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
 
