@@ -1,4 +1,4 @@
-# 05b_05b_rename_clusters.R
+# 05b_rename_clusters.R
 # Purpose: Insert cell type labels into a Seurat object
 # Author: Geoff Dilly
 
@@ -7,9 +7,13 @@ library(Seurat)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Load custom functions
+source("R/modules/log_utils.R")
+write_script_log("R/05b_rename_clusters.R")
+
 # Log the start time and a timestamped copy of the script
 write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/05b_rename_clusters.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05b_rename_clusters.R"), overwrite = FALSE)
+write_script_log("R/05b_rename_clusters.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")

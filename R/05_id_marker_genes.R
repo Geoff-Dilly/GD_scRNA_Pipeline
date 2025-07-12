@@ -11,10 +11,11 @@ setwd(snRNA_home_dir)
 
 # Load custom functions
 source("R/modules/plot_utils.R")
+source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
 write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/05_id_marker_genes.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05_id_marker_genes.R"), overwrite = FALSE)
+write_script_log("R/05_id_marker_genes.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")

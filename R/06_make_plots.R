@@ -1,4 +1,4 @@
-# 06_06_make_plots.R
+# 06_make_plots.R
 # Purpose: Make various plots for single-cell analysis
 # Author: Geoff Dilly
 
@@ -12,10 +12,11 @@ setwd(snRNA_home_dir)
 
 # Load custom functions
 source("R/modules/plot_utils.R")
+source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/06_make_plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "06_make_plots.R"), overwrite = FALSE)
+write_script_log("R/06_make_plots.R")
 
 # Load the configuration file
 source("sc_experiment_config.R")

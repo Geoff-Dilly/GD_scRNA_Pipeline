@@ -10,11 +10,12 @@ library(doParallel)
 snRNA_home_dir <- here()
 setwd(snRNA_home_dir)
 
+# Load custom functions
+source("R/modules/log_utils.R")
+
 # Log the start time and a timestamped copy of the script
 write(paste0("01b_soupx - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/01b_soupx.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "01b_soupx"), overwrite = FALSE)
-
-# Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
+write_script_log("R/01b_soupx.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R", local = TRUE)
@@ -27,6 +28,8 @@ registerDoParallel(cl)
 
 # Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
+
+# Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
 
 # Process each sample
 top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX")) %dopar% {
