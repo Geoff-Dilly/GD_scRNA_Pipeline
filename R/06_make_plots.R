@@ -28,7 +28,7 @@ combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_cluster
 DefaultAssay(combined_seurat) <- "SCT"
 
 # Set the identity to label clusters
-cluster_ident <- "seurat_clusters"
+cluster_ident <- scConfig.cluster_plot_ident
 
 # Overall QC: Ident = Project_name ####
 Idents(combined_seurat) <- combined_seurat$orig.ident

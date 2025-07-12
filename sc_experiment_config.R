@@ -77,3 +77,7 @@ scConfig.clustering_PCAs <- 25
 # clustering_resolution - Datatype: Int
 # Resolution may be estimated with Clustree
 scConfig.clustering_resolution <- 0.5
+
+# cluster_plot_ident - Datatype: String
+# Identity used by cluster and DGE plots
+scConfig.cluster_plot_ident <- "seurat_clusters"
