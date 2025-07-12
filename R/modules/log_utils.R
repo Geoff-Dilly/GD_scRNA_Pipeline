@@ -28,5 +28,3 @@ write_script_log <- function(script_file) {
   # Close the log file connection
   close(log_connection)
 }
-
-write_script_log("R/01_load_data.R")

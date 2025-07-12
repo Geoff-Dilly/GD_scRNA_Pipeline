@@ -28,7 +28,7 @@ n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-# Run doubletFinder ####
+# Run DoubletFinder ####
 # Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
