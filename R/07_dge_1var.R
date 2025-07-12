@@ -29,7 +29,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores/2)
+cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
 # Pseudobulking and data processing ####
@@ -60,7 +60,7 @@ colnames_vec <- colnames(pseudobulked_seurat$RNA)
 clusters <- unique(pseudobulked_seurat$seurat_clusters)
 conditions <- unique(pseudobulked_seurat$Treatment)
 
-# DGE Analysis and Plotting ####
+# DGE analysis and plotting ####
 summary_list <- foreach(cluster = clusters,
                         .packages = c("Seurat", "DESeq2", "dplyr", "pheatmap", "ggrepel",
                                       "tibble", "stringr", "ggplot2")) %dopar% {
@@ -104,12 +104,12 @@ summary_list <- foreach(cluster = clusters,
 
   # Plot heatmap
   cluster_heatmap <-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
-  save_plot_pdf(cluster_heatmap, paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"), 
+  save_plot_pdf(cluster_heatmap, paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"),
                 height = 6, width = 8)
 
   # Plot dispersion estimates
   dispersion_plot <- plotDispEsts(dds)
-  save_plot_pdf(dispersion_plot, paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"), 
+  save_plot_pdf(dispersion_plot, paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"),
                 height = 6, width = 8)
 
   # Set up the contrast for DESeq2, run DGE, and apply LFC shrinkage
@@ -186,12 +186,12 @@ summary_list <- foreach(cluster = clusters,
           axis.title = element_text(size = rel(1.25)))
 
   # Save the volcano plot
-  save_plot_pdf(volc_plot, paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"), 
+  save_plot_pdf(volc_plot, paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"),
                 height = 6, width = 8)
 
   # Make an MA plot for quality control
   ma_plot <- plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
-  save_plot_pdf(ma_plot, paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"), 
+  save_plot_pdf(ma_plot, paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"),
                 height = 6, width = 8)
 
   # Return the summary
