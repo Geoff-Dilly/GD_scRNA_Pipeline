@@ -72,7 +72,7 @@ scConfig.Raw_data_folder <- "Raw_Data"
 scConfig.mito_pattern <- "^mt-"
 
 # ribo_pattern - Datatype: String
-# Str pattern that identifies mitochondrial genes
+# Str pattern that identifies ribosomal genes
 scConfig.ribo_pattern <- "^Rp[ls]"
 
 # nFeature_RNA_cutoff - Datatype: Int 
@@ -85,13 +85,31 @@ scConfig.nFeature_RNA_cutoff <- 200
 # Recommended = 5
 scConfig.percent_mito_cutoff <- 5
 
+# percent_ribo_cutoff - Datatype: Int
+# Maximum percentage of ribosomal reads to include cell
+# Recommended = 5
+scConfig.percent_ribo_cutoff <- 5
+
+# expected_doublet_pct - Datatype: Int
+# Expected percentage of doublets in the dataset
+# Recommended = 7.5 (5 to 10%)
+scConfig.expct_doublet_pct <- 7.5
+
+# soupx_adjust - Datatype: Bool (TRUE/FALSE)
+# If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
+scConfig.soupx_adjust <- FALSE
+
 # remove_doublets - Datatype: Bool (TRUE/FALSE)
 # If TRUE doublets identified by DoubletFinder be removed prior to SCT normalization
 scConfig.remove_doublets <- FALSE
 
 # remove_mito_genes - Datatype: Bool (TRUE/FALSE)
 # If TRUE mitochondrial genes will be removed prior to clustering
-scConfig.remove_mito_genes <- FALSE 
+scConfig.remove_mito_genes <- FALSE
+
+# remove_ribo_genes - Datatype: Bool (TRUE/FALSE)
+# If TRUE ribosomal genes will be removed prior to clustering
+scConfig.remove_ribo_genes <- FALSE
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)
 # If TRUE the 25% of cells with the highest UMI count will be removed from the data
@@ -104,6 +122,11 @@ scConfig.clustering_PCAs <- 25
 # clustering_resolution - Datatype: Int
 # Resolution may be estimated with Clustree
 scConfig.clustering_resolution <- 0.5
+
+# cluster_plot_ident - Datatype: String
+# Identity used by cluster and DGE plots
+scConfig.cluster_plot_ident <- "seurat_clusters"
+
 EOF
 fi
 

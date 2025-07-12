@@ -28,11 +28,11 @@ n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-# Run doubletFinder ####
+# Run DoubletFinder ####
 # Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
-# Run doubletFinder in a parallel processing loop
+# Run DoubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
   sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
 
