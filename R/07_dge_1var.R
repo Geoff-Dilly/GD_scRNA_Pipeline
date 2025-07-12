@@ -112,7 +112,7 @@ summary_list <- foreach(cluster = clusters,
                 height = 6, width = 8)
 
   # Set up the contrast for DESeq2, run DGE, and apply LFC shrinkage
-  contrast <- c("Treatment", levels(as.factor(cluster_metadata$Treatment))[2], levels(as.factor(cluster_metadata$Treatment))[1])
+  contrast <- c("Treatment", levels(as.factor(col_data$Treatment))[2], levels(as.factor(col_data$Treatment))[1])
   res <- results(dds, contrast = contrast, alpha = 0.05)
   res <- lfcShrink(dds, contrast =  contrast, res = res, type = "normal")
 

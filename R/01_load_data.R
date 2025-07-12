@@ -39,7 +39,7 @@ if (!("Raw_data_dir" %in% colnames(scConfig.Sample_metadata))) {
 
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores/2)
+cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
 sample_list <- split(scConfig.Sample_metadata, seq_len(nrow(scConfig.Sample_metadata)))
