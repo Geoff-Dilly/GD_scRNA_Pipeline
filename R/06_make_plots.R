@@ -22,7 +22,7 @@ source("sc_experiment_config.R")
 
 # Load the clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
-DefaultAssay(combined_seurat) <- "RNA"
+DefaultAssay(combined_seurat) <- "SCT"
 
 # Make all of the figures from previous scripts ####
 # Check quality metrics for each cell
@@ -142,19 +142,21 @@ save_plot_pdf(top2markers_diff_dotplot, "Plots/Clustering_Plots/Top2_Markers_Dif
 
 
 # Marker gene plots ####
-# Using markers from Dilly et al 2022 
-id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
-                 "Ndrg2", "Slc1a2", "Slc4a4",
-                 "Slc17a7", "Satb1", "Neurod6", "Vcan",
-                 "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
-                 "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153",
-                 "Rsph1", "Tmem212", "Rbfox3")
+# Using markers from Dilly et al 2022
+major_marker_genes_list <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
+                             "Ndrg2", "Slc1a2", "Slc4a4",
+                             "Slc17a7", "Satb1", "Neurod6", "Vcan",
+                             "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
+                             "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153",
+                             "Rsph1", "Tmem212", "Rbfox3")
 
-major_cells_dotplot <- DotPlot(combined_seurat, features = id_features) + RotatedAxis()
+major_marker_genes_unique <- unique(unlist(major_marker_genes_list))
+
+major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()
 save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_cells_dotplot.pdf", height = 4, width = 6)
 
 # DS Cell Subtypes ####
-# From
+# From Wildermuth et al 2025
 dSPN <- c("Drd1", "Pdyn")
 iSPN <- c("Drd2", "Adora2a")
 eSPN <- c("Otof", "Col11a1")
@@ -196,14 +198,24 @@ for (marker in all_markers_list){
 }
 
 # Make a stacked violin plot for the DS marker genes
-make_stacked_vln_plot(seurat_obj = combined_seurat,
-                      features = DS_marker_genes_unique,
-                      assay = "SCT",
-                      slot = "data",
-                      adjust = 2.5,
-                      pt.size = 0,
-                      gene_label_size = 8)
-save_plot_pdf(stackers, "Plots/Clustering_Plots/marker_stacked_vln_plot.pdf", height = 12, width = 4)
+mkr_stack_vln_plot <- make_stacked_vln_plot(seurat_obj = combined_seurat,
+                                             features = unique(top_markers2$gene),
+                                             assay = "SCT",
+                                             slot = "data",
+                                             adjust = 2.5,
+                                             pt.size = 0,
+                                             gene_label_size = 8)
+save_plot_pdf(mkr_stack_vln_plot, "Plots/Clustering_Plots/topmkr_stacked_vln_plot.pdf", height = 12, width = 4)
+
+# Make a stacked violin plot for the DS marker genes
+mkr_stack_vln_plot <- make_stacked_vln_plot(seurat_obj = combined_seurat,
+                                             features = DS_marker_genes_unique,
+                                             assay = "SCT",
+                                             slot = "data",
+                                             adjust = 2.5,
+                                             pt.size = 0,
+                                             gene_label_size = 8)
+save_plot_pdf(mkr_stack_vln_plot, "Plots/Clustering_Plots/marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Log the completion time
 write(paste0("06_make_plots - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
