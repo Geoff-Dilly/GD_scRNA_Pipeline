@@ -8,12 +8,17 @@ library(stringr)
 library(DoubletFinder)
 library(doParallel)
 library(foreach)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
+
+# Setup ####
+# Load custom functions
+source("R/modules/plot_utils.R")
+source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/02_doubletfinder.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "02_doubletfinder.R"), overwrite = FALSE)
+write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write_script_log("R/02_doubletfinder.R")
 
 # Read the sample metadata file
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
@@ -23,10 +28,11 @@ n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
+# Run doubletFinder ####
+# Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
-# Run doubletFinder --------------------
-# Parallel processing loop
+# Run doubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
   sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
 
@@ -43,10 +49,15 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
   homotypic_prop <- modelHomotypic(sample_seurat@meta.data$Sample_name)
-  nExp_poi <- round(0.075 * nrow(sample_seurat@meta.data))
+  nExp_poi <- round((scConfig.expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
   nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
-  sample_seurat <- doubletFinder(sample_seurat, PCs = 1:10, pN = 0.25, pK = pK_value, nExp = nExp_poi, sct = FALSE)
+  sample_seurat <- doubletFinder(sample_seurat,
+                                 PCs = 1:10,
+                                 pN = 0.25,
+                                 pK = pK_value,
+                                 nExp = nExp_poi,
+                                 sct = FALSE)
 
   meta_cols <- colnames(sample_seurat@meta.data)
   score <- str_subset(meta_cols, "^pANN")
@@ -66,4 +77,4 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 stopCluster(cl)
 
 # Log the completion time
-write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

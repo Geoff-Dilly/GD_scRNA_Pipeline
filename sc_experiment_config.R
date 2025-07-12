@@ -1,13 +1,13 @@
-# Experiment configuration file for Messing/Mayfield snRNA-seq analysis using Seurat
+# Experiment configuration file for Messing/Mayfield scRNA-seq analysis using Seurat
 # Written by Geoffrey A. Dilly in June 2024
 
 # Project_name - Datatype: String
 # Name of the project for Seurat
-scConfig.Project_name <- "GD_snRNA_Experiment"
+scConfig.Project_name <- "GD_scRNA_Experiment"
 
 # Project_name - Datatype: String
 # Prefix for filenames of R objects
-scConfig.Prefix <- "GD_snRNA"
+scConfig.Prefix <- "GD_scRNA"
 
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located
@@ -40,6 +40,20 @@ scConfig.nFeature_RNA_cutoff <- 200
 # Recommended = 5
 scConfig.percent_mito_cutoff <- 5
 
+# percent_ribo_cutoff - Datatype: Int
+# Maximum percentage of ribosomal reads to include cell
+# Recommended = 5
+scConfig.percent_ribo_cutoff <- 5
+
+# expected_doublet_pct - Datatype: Int
+# Expected percentage of doublets in the dataset
+# Recommended = 7.5 (5 to 10%)
+scConfig.expct_doublet_pct <- 7.5
+
+# soupx_adjust - Datatype: Bool (TRUE/FALSE)
+# If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
+scConfig.soupx_adjust <- FALSE
+
 # remove_doublets - Datatype: Bool (TRUE/FALSE)
 # If TRUE doublets identified by DoubletFinder be removed prior to SCT normalization
 scConfig.remove_doublets <- FALSE
@@ -49,7 +63,7 @@ scConfig.remove_doublets <- FALSE
 scConfig.remove_mito_genes <- FALSE
 
 # remove_ribo_genes - Datatype: Bool (TRUE/FALSE)
-# If TRUE mitochondrial genes will be removed prior to clustering
+# If TRUE ribosomal genes will be removed prior to clustering
 scConfig.remove_ribo_genes <- FALSE
 
 # remove_top_nUMIs - Datatype: Bool (TRUE/FALSE)
@@ -63,3 +77,7 @@ scConfig.clustering_PCAs <- 25
 # clustering_resolution - Datatype: Int
 # Resolution may be estimated with Clustree
 scConfig.clustering_resolution <- 0.5
+
+# cluster_plot_ident - Datatype: String
+# Identity used by cluster and DGE plots
+scConfig.cluster_plot_ident <- "seurat_clusters"

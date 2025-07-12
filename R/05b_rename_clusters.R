@@ -1,15 +1,20 @@
-# 05b_05b_rename_clusters.R
+# 05b_rename_clusters.R
 # Purpose: Insert cell type labels into a Seurat object
 # Author: Geoff Dilly
 
 library(here)
 library(Seurat)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
+
+# Setup ####
+# Load custom functions
+source("R/modules/log_utils.R")
+write_script_log("R/05b_rename_clusters.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/05b_rename_clusters.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "05b_rename_clusters.R"), overwrite = FALSE)
+write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write_script_log("R/05b_rename_clusters.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -18,9 +23,8 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 # Load clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
-# Rename each Seurat cluster
-# Note: You will have to manually edit this field to the correct length
-# Running this script will substantially increase the size of the Seurat object
+# Rename Seurat clusters ####
+# Note: Manually edit this field to the correct length
 combined_seurat <- RenameIdents(object = combined_seurat,
                                 "0" = "Cluster_0",
                                 "1" = "Cluster_1",
@@ -74,4 +78,4 @@ Idents(combined_seurat) <- combined_seurat$seurat_clusters
 saveRDS(combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
 # Log the completion time
-write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

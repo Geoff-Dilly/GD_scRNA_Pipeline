@@ -4,17 +4,20 @@
 
 library(here)
 library(Seurat)
+library(dplyr)
 library(SoupX)
 library(foreach)
 library(doParallel)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
+
+# Setup ####
+# Load custom functions
+source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("01b_soupx - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/01b_soupx.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "01b_soupx"), overwrite = FALSE)
-
-# Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
+write(paste0("01b_soupx - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write_script_log("R/01b_soupx.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R", local = TRUE)
@@ -22,12 +25,16 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores/2)
+cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
+# Data Preprocessing ####
 # Place each sample in a list for further processing
 str_sample_list <- scConfig.Sample_metadata$Sample_name
 
+# Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
+
+# Run SoupX ####
 # Process each sample
 top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX")) %dopar% {
 
@@ -80,8 +87,8 @@ top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seura
 }
 
 # Combine and write summary
-summary_df <- dplyr::bind_rows(top_ambient_genes)
+summary_df <- bind_rows(top_ambient_genes)
 write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
 
 # Log the completion time
-write(paste0("01b_soupx - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01b_soupx - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

@@ -1,4 +1,4 @@
-# 06_06_make_plots.R
+# 06_make_plots.R
 # Purpose: Make various plots for single-cell analysis
 # Author: Geoff Dilly
 
@@ -7,279 +7,320 @@ library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
+
+# Setup ####
+# Load custom functions
+source("R/modules/plot_utils.R")
+source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/06_make_plots.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "06_make_plots.R"), overwrite = FALSE)
+write(paste0("06_make_plots - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write_script_log("R/06_make_plots.R")
 
 # Load the configuration file
 source("sc_experiment_config.R")
 
 # Load the clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+DefaultAssay(combined_seurat) <- "SCT"
 
-# Make all of the figures from previous scripts ####
+# Set the identity to label clusters
+cluster_ident <- scConfig.cluster_plot_ident
 
-# Check quality metrics for each cell
-qc_vlns_plot <- VlnPlot(combined_seurat, features = c("nFeature_RNA", "nCount_RNA", "percent_mito"), ncol = 3, pt.size = 0)
-pdf("Plots/Quality_Control/QC_VlnPlot.pdf")
-print(qc_vlns_plot)
-dev.off()
+# Overall QC: Ident = Project_name ####
+Idents(combined_seurat) <- combined_seurat$orig.ident
 
-# Examine the raw UMAP
-raw_umap_plot <- DimPlot(combined_seurat)
-pdf("Plots/Clustering_Plots/Raw_UMAP.pdf", height = 4, width = 6)
-print(raw_umap_plot)
-dev.off()
+# Quality metric violin plots
+qc_vlns_plot <- VlnPlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  pt.size = 0, ncol = 5
+) + NoLegend() & theme(axis.text.x = element_blank())
+
+save_plot_pdf(qc_vlns_plot, "Plots/Quality_Control/QC_VlnPlot.pdf", height = 3, width = 18)
 
 # Examine QC metrics on the UMAP plot
-qc_umap_plot <- FeaturePlot(combined_seurat, features = c("percent_mito", "nFeature_RNA", "Doublet_Score"))
-pdf("Plots/Quality_Control/QC_UMAP.pdf", height = 4, width = 10)
-print(qc_umap_plot)
-dev.off()
+qc_umap_plot <- FeaturePlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  ncol = 5
+) & theme(axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())
 
-# Examine percent ribosomal RNA on a UMAP
-ribo_umap_plot <- FeaturePlot(combined_seurat, features = "percent_ribo")
-pdf("Plots/Quality_Control/PctRibo_UMAP.pdf", height = 4, width = 10)
-print(ribo_umap_plot)
-dev.off()
+save_plot_pdf(qc_umap_plot, "Plots/Quality_Control/QC_UMAP.pdf", height = 3, width = 18)
 
 # Examine doublet score in doublets and non doublets
-doublet_call_umap_plot <- FeaturePlot(combined_seurat, features = "Doublet_Score", split.by = "Doublet_Call")
-pdf("Plots/Quality_Control/Doublet_Call_UMAP.pdf", height = 4, width = 10)
-print(doublet_call_umap_plot)
-dev.off()
+if (scConfig.remove_doublets == FALSE) {
+  doublet_call_umap_plot <- FeaturePlot(
+    combined_seurat,
+    features = "Doublet_Score",
+    split.by = "Doublet_Call"
+  )
+  save_plot_pdf(doublet_call_umap_plot, "Plots/Quality_Control/Doublet_Call_UMAP.pdf", height = 4, width = 10)
+}
 
-# Examine QC metrics by animal
+# Sex-level QC: Ident = Sex ####
+Idents(combined_seurat) <- combined_seurat$Sex
+
+# Plot by sex on the UMAP
+sex_umap_plot <- DimPlot(combined_seurat)
+save_plot_pdf(sex_umap_plot, "Plots/Quality_Control/Sex_UMAP.pdf", height = 4, width = 6)
+
+# Quality metric violin plots
+qc_bysex_vlns_plot <- VlnPlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  pt.size = 0, stack = TRUE, flip = TRUE
+) + NoLegend() & theme(axis.text.x = element_blank(), axis.title = element_blank())
+
+save_plot_pdf(qc_bysex_vlns_plot, "Plots/Quality_Control/QC_bySex_VlnPlot.pdf")
+
+# Treatment-level QC: Ident = Treatment ####
+Idents(combined_seurat) <- combined_seurat$Treatment
+
+# Plot by sex on the UMAP
+treatment_umap_plot <- DimPlot(combined_seurat)
+save_plot_pdf(treatment_umap_plot, "Plots/Quality_Control/Treatment_UMAP.pdf", height = 4, width = 6)
+
+# Quality metric violin plots
+qc_bytreatment_vlns_plot <- VlnPlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  pt.size = 0, ncol = 5
+) & theme(axis.title.x = element_blank())
+
+save_plot_pdf(qc_bytreatment_vlns_plot, "Plots/Quality_Control/QC_byTreatment_VlnPlot.pdf", height = 3, width = 18)
+
+# Sample-level QC: Ident = Sample_name ####
 Idents(combined_seurat) <- combined_seurat$Sample_name
 
-# Umap
+# Plot by sample on the UMAP
 sample_umap_plot <- DimPlot(combined_seurat)
-pdf("Plots/Quality_Control/Sample_UMAP.pdf", height = 4, width = 6)
-print(sample_umap_plot)
-dev.off()
+save_plot_pdf(sample_umap_plot, "Plots/Quality_Control/Sample_UMAP.pdf", height = 4, width = 6)
 
-# Violin plots
-nFeature_vln_by_animal <- VlnPlot(combined_seurat, features = "nFeature_RNA", pt.size = 0)
-pdf("Plots/Quality_Control/nFeature_vln_byAnimal.pdf", height = 4, width = 6)
-print(nFeature_vln_by_animal)
-dev.off()
+# By sample QC violin plots
+qc_by_sample_vln_plot <- VlnPlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  pt.size = 0, stack = TRUE, flip = TRUE
+) + NoLegend()
 
-nCount_vln_by_animal <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0)
-pdf("Plots/Quality_Control/nCount_vln_byAnimal.pdf", height = 4, width = 6)
-print(nCount_vln_by_animal)
-dev.off()
+save_plot_pdf(qc_by_sample_vln_plot, "Plots/Quality_Control/QC_bySample_VlnPlot.pdf", height = 4, width = 12)
 
-percent_mito_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_mito", pt.size = 0)
-pdf("Plots/Quality_Control/pctMito_vln_byAnimal.pdf", height = 4, width = 6)
-print(percent_mito_vln_by_animal)
-dev.off()
+# Scatterplot: nCount_RNA vs nFeature_RNA, colored by sample
+scatter_nc_vs_nf <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = nFeature_RNA, y = nCount_RNA, color = Sample_name)
+) +
+  geom_point(alpha = 0.4, size = 1) +
+  theme_classic() +
+  xlab("Number of detected genes (nFeature_RNA)") +
+  ylab("Number of UMIs (nCount_RNA)") +
+  ggtitle("nCount_RNA vs nFeature_RNA by Sample") +
+  theme(
+    legend.title = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.title = element_text(size = 14, face = "bold")
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
 
-percent_ribo_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_ribo", pt.size = 0)
-pdf("Plots/Quality_Control/pctribo_vln_byAnimal.pdf", height = 4, width = 6)
-print(percent_ribo_vln_by_animal)
-dev.off()
+save_plot_pdf(scatter_nc_vs_nf, "Plots/Quality_Control/Scatter_nCount_vs_nFeature_bySample.pdf", height = 5, width = 7)
 
-# Examine proportions
-#plot samples as proportion or percentage of cluster
-sample_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = seurat_clusters, fill = Sample_name)) +
+# Cluster-level QC: Ident = Seurat_clusters ####
+Idents(combined_seurat) <- cluster_ident
+
+# Clustered QC plots
+# Plot by cluster on the UMAP
+sample_umap_plot <- DimPlot(combined_seurat)
+save_plot_pdf(sample_umap_plot, "Plots/Quality_Control/Cluster_UMAP.pdf", height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, "Plots/Clustering_Plots/Cluster_UMAP.pdf", height = 4, width = 6)
+
+sample_umap_plot <- DimPlot(combined_seurat, label = TRUE)
+save_plot_pdf(sample_umap_plot, "Plots/Quality_Control/Cluster_UMAP_labeled.pdf", height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, "Plots/Clustering_Plots/Cluster_UMAP.pdf", height = 4, width = 6)
+
+# Proportion bar plots
+# Cell count barplot per sample (counts as height)
+cell_count_barplot <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = Sample_name, fill = .data[[cluster_ident]])
+) +
+  geom_bar() +
+  theme_classic() +
+  xlab("Sample Name") +
+  ylab("Cell Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  guides(fill = "none")
+
+save_plot_pdf(cell_count_barplot, "Plots/Quality_Control/Cell_Counts_Barplot.pdf", height = 4, width = 6)
+
+# Plot samples as proportion or percentage of cluster
+sample_prop_bar_plot <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = .data[[cluster_ident]], fill = Sample_name)
+) +
   geom_bar(position = "fill") +
   RotatedAxis() +
   xlab("Sample Name")
-pdf("Plots/Quality_Control/Sample_prop_barPlot.pdf", height = 4, width = 6)
-print(sample_prop_bar_plot)
-dev.off()
 
-#Plot samples as proportion or percentage of cluster
-cluster_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = Sample_name, fill = seurat_clusters)) +
+save_plot_pdf(sample_prop_bar_plot, "Plots/Quality_Control/Sample_prop_barPlot.pdf", height = 4, width = 6)
+
+# Plot samples as proportion or percentage of cluster
+cluster_prop_bar_plot <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = Sample_name, fill = .data[[cluster_ident]])
+) +
   geom_bar(position = "fill") +
   RotatedAxis() +
   xlab("Sample Name")
-pdf("Plots/Quality_Control/Cluster_prop_barPlot.pdf", height = 4, width = 6)
-print(cluster_prop_bar_plot)
-dev.off()
 
-#plot proportions of each condition in each cluster
-cond_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = seurat_clusters, fill = Treatment)) +
+save_plot_pdf(cluster_prop_bar_plot, "Plots/Quality_Control/Cluster_prop_barPlot.pdf", height = 4, width = 6)
+
+# Plot proportions of each condition in each cluster
+cond_prop_bar_plot <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = .data[[cluster_ident]], fill = Treatment)
+) +
   geom_bar(position = "fill") +
-  geom_hline(yintercept = 12 / 33, linetype = "dashed", size = 1) +
-  geom_hline(yintercept = 22 / 33, linetype = "dashed", size = 1) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", size = 1) +
   RotatedAxis() +
   xlab("Sample Name")
-pdf("Plots/Quality_Control/Cond_prop_barPlot.pdf", height = 4, width = 6)
-print(cond_prop_bar_plot)
-dev.off()
 
-#plot proportions of each sex in each cluster
-sex_prop_bar_plot <- ggplot(combined_seurat@meta.data, aes(x = seurat_clusters, fill = Sex)) +
+save_plot_pdf(cond_prop_bar_plot, "Plots/Quality_Control/Cond_prop_barPlot.pdf", height = 4, width = 6)
+
+# Plot proportions of each sex in each cluster
+sex_prop_bar_plot <- ggplot(
+  combined_seurat@meta.data,
+  aes(x = .data[[cluster_ident]], fill = Sex)
+) +
   geom_bar(position = "fill") +
   geom_hline(yintercept = 0.5, linetype = "dashed", size = 1) +
   RotatedAxis() +
   xlab("Cluster")
-pdf("Plots/Quality_Control/Sex_prop_barPlot.pdf", height = 4, width = 6)
-print(sex_prop_bar_plot)
-dev.off()
 
-# Clustered QC plots ####
+save_plot_pdf(sex_prop_bar_plot, "Plots/Quality_Control/Sex_prop_barPlot.pdf", height = 4, width = 6)
 
-# Examine the clustered UMAP
-Idents(combined_seurat) <- combined_seurat$seurat_clusters
+# By cluster QC violin plots
+qc_by_cluster_vln_plot <- VlnPlot(
+  combined_seurat,
+  features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo", "Doublet_Score"),
+  pt.size = 0, stack = TRUE, flip = TRUE
+) + NoLegend()
 
-clustered_umap_plot <- DimPlot(combined_seurat)
-pdf("Plots/Quality_Control/Clustered_UMAP.pdf", height = 4, width = 6)
-print(clustered_umap_plot)
-dev.off()
+save_plot_pdf(QC_bycluster_vln_plot, "Plots/Quality_Control/QC_byCluster_VlnPlot.pdf", height = 4, width = 12)
 
-# Visualize QC metrics in each cluster
-percent_mito_vln_plot <- VlnPlot(combined_seurat, features = "percent_mito", pt.size = 0)
-pdf("Plots/Quality_Control/PercentMito_Violin.pdf")
-print(percent_mito_vln_plot)
-dev.off()
-
-nFeature_vln_plot <- VlnPlot(combined_seurat, features = "nFeature_RNA", pt.size = 0)
-pdf("Plots/Quality_Control/nFeature_Violin.pdf", height = 4, width = 8)
-print(nFeature_vln_plot)
-dev.off()
-
-nCount_vln_plot <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0)
-pdf("Plots/Quality_Control/nCount_Violin.pdf", height = 4, width = 8)
-print(nCount_vln_plot)
-dev.off()
-
-doublet_score_vln_plot <- VlnPlot(combined_seurat, features = "Doublet_Score", pt.size = 0)
-pdf("Plots/Quality_Control/Doublet_Score_Violin.pdf", height = 4, width = 8)
-print(doublet_score_vln_plot)
-dev.off()
-
-percent_ribo_vln_plot <- VlnPlot(combined_seurat, features = "percent_ribo", pt.size = 0)
-pdf("Plots/Quality_Control/percent_ribo_Violin.pdf", height = 4, width = 8)
-print(percent_ribo_vln_plot)
-dev.off()
-
-# Look at the marker genes identified by Seurat ####
+# Marker gene plots ####
+# Load the marker genes previously identified with FindAllMarkers()
 all_markers <- read.csv("CSV_Results/Marker_Genes_All/All_marker_genes.csv")
 
 # Visualize the top marker gene expression in each cluster
 top_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 1, wt = avg_log2FC)
-top_marker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene))+RotatedAxis()
-pdf("Plots/Clustering_Plots/Top_Marker_DotPlot.pdf", height = 8, width = 12)
-print(top_marker_dotplot)
-dev.off()
+top_marker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()
+save_plot_pdf(top_marker_dotplot, "Plots/Clustering_Plots/Top_Marker_DotPlot.pdf", height = 12, width = 18)
 
 # Visualize the top 2 marker genes expression in each cluster
 top_markers2 <- all_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
-top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene))+RotatedAxis()
-pdf("Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 8, width = 12)
-print(top2markers_dotplot)
-dev.off()
+top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
+save_plot_pdf(top2markers_dotplot, "Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 12, width = 18)
 
-# Visualize the top 2 marker genes expression in each cluster
-top_markers2_diff <- all_markers %>% group_by(cluster) %>% top_n(n = 2, wt = PCT_Delta)
-top2markers_diff_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2_diff$gene))+RotatedAxis()
-pdf("Plots/Clustering_Plots/Top2_Markers_diff_DotPlot.pdf", height = 8, width = 12)
-print(top2markers_diff_dotplot)
-dev.off()
+# Make a stacked violin plot for the DS marker genes
+marker_stack_vln_plot <- make_stacked_vln_plot(
+  seurat_obj = combined_seurat,
+  features = unique(top_markers2$gene),
+  assay = "SCT",
+  slot = "data",
+  adjust = 2.5,
+  pt.size = 0,
+  gene_label_size = 8
+)
+save_plot_pdf(marker_stack_vln_plot, "Plots/Clustering_Plots/Top_Marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
+# Load markers from Dilly et al 2022
+major_marker_genes_list <- c(
+  "Mbp", "Mobp", "Plp1", "Gad1", "Gad2", "Ndrg2", "Slc1a2", "Slc4a4",
+  "Slc17a7", "Satb1", "Neurod6", "Vcan", "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
+  "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153", "Rsph1", "Tmem212", "Rbfox3"
+)
+major_marker_genes_unique <- unique(unlist(major_marker_genes_list))
 
-# Marker gene plots ####
-# Using markers from Dilly et al 2022 
-id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
-                 "Ndrg2", "Slc1a2", "Slc4a4",
-                 "Slc17a7", "Satb1", "Neurod6", "Vcan",
-                 "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
-                 "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153",
-                 "Rsph1", "Tmem212", "Rbfox3")
+major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()
+save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_cells_dotplot.pdf", height = 4, width = 6)
 
-major_cells_dotplot <- DotPlot(combined_seurat, features = id_features) + RotatedAxis()
-pdf("Plots/Clustering_Plots/Major_cells_dotplot.pdf")
-print(major_cells_dotplot)
-dev.off()
+# Make a stacked violin plot for the DS marker genes
+brain_marker_stack_vln_plot <- make_stacked_vln_plot(
+  seurat_obj = combined_seurat,
+  features = major_marker_genes_unique,
+  assay = "SCT",
+  slot = "data",
+  adjust = 2.5,
+  pt.size = 0,
+  gene_label_size = 8
+)
+save_plot_pdf(brain_marker_stack_vln_plot, "Plots/Clustering_Plots/Brainmarker_stacked_vln_plot.pdf", height = 12, width = 4)
 
-# Relevant marker genes
-# Major Cell Types ####
-
-# Neurons
-All_Neurons <- c("Rbfox3", "Syn1", "Gria1")
-Inhibitory_Neurons <- c("Gad1", "Gad2")
-Excitatory_Neurons <- c("Neurod6", "Satb1", "Slc17a7") # Can be divided into 2 classes
-Cholinergic_Neurons <- c("Slc5a7", "Prima1")
-
-# Glia
-Astrocytes <- c("Slc1a2", "Slc1a3", "Ndrg2")
-Oligodendrocytes <- c("Mog", "Mobp", "Hapln2")
-Microglia <- c("Csf1r", "Apbb1ip", "Inpp5d")
-OPCs <- c("Vcan", "Pdgfra", "Pcdh15")
-Immature_Oligos <- c("Bmp4", "Cnp", "Tcf7l2") # - These might benefit from a more conservative name
-
-# Other Cells
-Endothelial_Cells <- c("Flt1", "B2m", "Rgs5")
-Ependymal_Cells <- c("Ccdc153", "Rsph1", "Tmem212")
-
-# Lists for programming
-DS_cell_types <- c("Astrocytes", "Oligodendrocytes", "Microglia", "OPCs",
-                   "Immature_Oligos", "All_Neurons", "Inhibitory_Neurons", "Excitatory_Neurons",
-                   "Cholinergic_Neurons", "Endothelial_Cells", "Ependymal_Cells")
-
-major_marker_genes <- c(Astrocytes, Oligodendrocytes, Microglia, OPCs,
-                        Immature_Oligos, All_Neurons, Inhibitory_Neurons, Excitatory_Neurons,
-                        Cholinergic_Neurons, Endothelial_Cells, Ependymal_Cells)
-
-major_marker_genes_unique <- unique(major_marker_genes)
-
-major_marker_genes_list <- list(Astrocytes, Oligodendrocytes, Microglia, OPCs,
-                                Immature_Oligos, All_Neurons, Inhibitory_Neurons, Excitatory_Neurons,
-                                Cholinergic_Neurons, Endothelial_Cells, Ependymal_Cells)
-
-
-# DS Cell Subtypes ####
-# From
-dSPN <- c("Drd1", "Ebf1", "Pdyn") #Pdyn over Ebf1?
-iSPN <- c("Drd2", "Adora2a", "Penk")
-eSPN <- c("Otof", "Col11a1")
-PVALB_IN <- c("Kit", "Pvalb")
-Chol_IN <- c("Tacr1", "Chat")
-SST_IN <- c("Sst", "Npy")
-Astro <- c("Slc1a3", "Rorb")
-Oligo <- c("Mog", "Aspa")
-OPC <- c("Pdgfra")
-Endo <- c("Flt1", "Slco1a4")
-Ependy <- c("Dnah12", "Rsph1", "Gm973")
-Mural <- c("Pdgfrb", "Rgs5")
+# DS Cell Subtypes
+# From Wildermuth et al 2025
+dSPN      <- c("Drd1", "Pdyn")
+iSPN      <- c("Drd2", "Adora2a")
+eSPN      <- c("Otof", "Col11a1")
+PVALB_IN  <- c("Kit", "Pvalb")
+Chol_IN   <- c("Tacr1", "Chat")
+SST_IN    <- c("Sst", "Npy")
+Astro     <- c("Slc1a3", "Rorb")
+Oligo     <- c("Mog", "Aspa")
+OPC       <- c("Pdgfra")
+Endo      <- c("Flt1", "Slco1a4")
+Ependy    <- c("Dnah12", "Rsph1", "Gm973")
+Mural     <- c("Pdgfrb", "Rgs5")
 Microglia <- c("C1qc", "Cx3cr1")
 
-DS_cell_types <- c(dSPN, iSPN, eSPN, PVALB_IN, Chol_IN,
-                   SST_IN, Astro, Oligo, OPC, Endo,
-                   Ependy, Mural, Microglia)
+DS_cell_types <- c(
+  dSPN, iSPN, eSPN, PVALB_IN, Chol_IN, SST_IN,
+  Astro, Oligo, OPC, Endo, Ependy, Mural, Microglia
+)
 
+DS_marker_genes_list <- list(
+  dSPN, iSPN, eSPN, PVALB_IN, Chol_IN, SST_IN,
+  Astro, Oligo, OPC, Endo, Ependy, Mural, Microglia
+)
+DS_marker_genes_unique <- unique(unlist(DS_marker_genes_list))
 
-DS_marker_genes_list <- list(dSPN, iSPN, eSPN, PVALB_IN, Chol_IN,
-                             SST_IN, Astro, Oligo, OPC, Endo,
-                             Ependy, Mural, Microglia)
+DS_cells_dotplot <- DotPlot(combined_seurat, features = DS_marker_genes_unique) + RotatedAxis()
+save_plot_pdf(DS_cells_dotplot, "Plots/Clustering_Plots/DS_markers_dotplot.pdf", height = 4, width = 6)
 
-DS_marker_genes_unique <- unique(DS_marker_genes_list)
-
-# Examine the resulting UMAP ####
-clustered_umap_plot_lbl <- DimPlot(combined_seurat, label = TRUE)
-pdf("Plots/Clustering_Plots/Clustered_UMAP.pdf", height = 6, width = 8)
-print(clustered_umap_plot)
-dev.off()
-
-all_markers_list <- c(major_marker_genes_unique, DS_marker_genes_unique)
+# Make a stacked violin plot for the DS marker genes
+DS_marker_stack_vln_plot <- make_stacked_vln_plot(
+  seurat_obj = combined_seurat,
+  features = DS_marker_genes_unique,
+  assay = "SCT",
+  slot = "data",
+  adjust = 2.5,
+  pt.size = 0,
+  gene_label_size = 8
+)
+save_plot_pdf(DS_marker_stack_vln_plot, "Plots/Clustering_Plots/DS_marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Generate featureplots and violinplots for genes of interest
-for (marker in all_markers_list){
-  gene_feature_plot <- FeaturePlot(combined_seurat, features = marker)
-  pdf(paste0("Plots/Clustering_Plots/Marker_Feature_Plots/", marker, "_FeaturePlot.pdf"), height = 4, width = 6)
-  print(gene_feature_plot)
-  dev.off()
+all_markers_list <- c(major_marker_genes_unique, DS_marker_genes_unique)
 
-  gene_violin_plot <- VlnPlot(combined_seurat, features = marker, pt.size = 0)
-  pdf(paste0("Plots/Clustering_Plots/Marker_Violin_Plots/", marker, "_ViolinPlot.pdf"), height = 4, width = 6)
-  print(gene_violin_plot)
-  dev.off()
+for (marker in all_markers_list) {
+  gene_feature_plot <- FeaturePlot(combined_seurat, features = marker)
+  save_plot_pdf(
+    gene_feature_plot,
+    paste0("Plots/Clustering_Plots/Marker_Feature_Plots/", marker, "_FeaturePlot.pdf"),
+    height = 4, width = 6
+  )
+
+  gene_violin_plot <- VlnPlot(combined_seurat, features = marker, pt.size = 0) + NoLegend()
+  save_plot_pdf(
+    gene_violin_plot,
+    paste0("Plots/Clustering_Plots/Marker_Violin_Plots/", marker, "_ViolinPlot.pdf"),
+    height = 4, width = 6
+  )
 }
 
 # Log the completion time
-write(paste0("06_make_plots - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("06_make_plots - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

@@ -10,13 +10,18 @@ library(tidyverse)
 library(DESeq2)
 library(ggrepel)
 library(pheatmap)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
+# Load custom functions
+source("R/modules/plot_utils.R")
+source("R/modules/log_utils.R")
+write_script_log("R/01b_soupx.R")
+
 # Log the start time and a time stamped copy of the script
-write(paste0("07_dge_1var - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
-file.copy("R/07_dge_1var.R", paste0("Logs/Time_", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), "_", "07_dge_1var.R"), overwrite = FALSE)
+write(paste0("07_dge_1var - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write_script_log("R/07_dge_1var.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -24,7 +29,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores/2)
+cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
 # Pseudobulking and data processing ####
@@ -32,8 +37,17 @@ registerDoParallel(cl)
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 print(unique(combined_seurat$Sample_name))
 
+# Select the assay for DESeq2 analysis
+if (scConfig.soupx_adjust == TRUE) {
+  # If SoupX was used, set the default assay to SoupX
+  dge_assay <- "SoupX"
+} else {
+  # If SoupX was not used, use RNA
+  dge_assay <- "RNA"
+}
+
 # Create pseudobulked seurat object
-pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = "RNA", return.seurat = TRUE,
+pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = dge_assay, return.seurat = TRUE,
                                            group.by = c("Treatment", "Sample_name", "seurat_clusters"))
 
 pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat$seurat_clusters, sep = "_")
@@ -46,7 +60,7 @@ colnames_vec <- colnames(pseudobulked_seurat$RNA)
 clusters <- unique(pseudobulked_seurat$seurat_clusters)
 conditions <- unique(pseudobulked_seurat$Treatment)
 
-# DGE Analysis and Plotting ####
+# DGE analysis and plotting ####
 summary_list <- foreach(cluster = clusters,
                         .packages = c("Seurat", "DESeq2", "dplyr", "pheatmap", "ggrepel",
                                       "tibble", "stringr", "ggplot2")) %dopar% {
@@ -76,45 +90,32 @@ summary_list <- foreach(cluster = clusters,
   rld <- rlog(dds, blind = TRUE)
 
   # Plot PCAs by condition and sample
-  plot1 <- DESeq2::plotPCA(rld, intgroup = "Treatment", ntop = 50)
+  pca_plot_by_condition <- DESeq2::plotPCA(rld, intgroup = "Treatment", ntop = 50)
+  save_plot_pdf(pca_plot_by_condition, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_PCA.pdf"),
+                height = 6, width = 8)
 
-  pdf(paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_PCA.pdf"))
-  print(plot1)
-  dev.off()
-
-  plot2 <- DESeq2::plotPCA(rld, intgroup = "Sample_name", ntop = 50)
-
-  pdf(paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_sample_PCA.pdf"))
-  print(plot2)
-  dev.off()
+  pca_plot_by_sample <- DESeq2::plotPCA(rld, intgroup = "Sample_name", ntop = 50)
+  save_plot_pdf(pca_plot_by_sample, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_sample_PCA.pdf"),
+                height = 6, width = 8)
 
   # Extract the rlog matrix from the object and compute pairwise correlation values
   rld_mat <- assay(rld)
   rld_cor <- cor(rld_mat)
 
   # Plot heatmap
-  pdf(paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"))
-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
-  dev.off()
+  cluster_heatmap <-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
+  save_plot_pdf(cluster_heatmap, paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"),
+                height = 6, width = 8)
 
   # Plot dispersion estimates
-  plotDispEsts(dds)
+  dispersion_plot <- plotDispEsts(dds)
+  save_plot_pdf(dispersion_plot, paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"),
+                height = 6, width = 8)
 
-  pdf(paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"))
-  plotDispEsts(dds)
-  dev.off()
-
-  contrast <- c("Treatment", levels(as.factor(cluster_metadata$Treatment))[2], levels(as.factor(cluster_metadata$Treatment))[1])
-
-  res <- results(dds,
-                 contrast = contrast,
-                 alpha = 0.05)
-
-  res <- lfcShrink(dds,
-                   contrast =  contrast,
-                   res = res, type = "normal")
-
-  print(summary(res))
+  # Set up the contrast for DESeq2, run DGE, and apply LFC shrinkage
+  contrast <- c("Treatment", levels(as.factor(col_data$Treatment))[2], levels(as.factor(col_data$Treatment))[1])
+  res <- results(dds, contrast = contrast, alpha = 0.05)
+  res <- lfcShrink(dds, contrast =  contrast, res = res, type = "normal")
 
   # Turn the results object into a tibble for use with tidyverse functions
   res_tbl <- res %>%
@@ -184,15 +185,14 @@ summary_list <- foreach(cluster = clusters,
           plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25)))
 
-
-  pdf(paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"))
-  print(volc_plot)
-  dev.off()
+  # Save the volcano plot
+  save_plot_pdf(volc_plot, paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"),
+                height = 6, width = 8)
 
   # Make an MA plot for quality control
-  pdf(paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"))
-  plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
-  dev.off()
+  ma_plot <- plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
+  save_plot_pdf(ma_plot, paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"),
+                height = 6, width = 8)
 
   # Return the summary
   summary
@@ -205,4 +205,4 @@ stopCluster(cl)
 summary_df <- dplyr::bind_rows(summary_list)
 write.csv(summary_df, "CSV_Results/DEGs_All/DGE_summary.csv", row.names = FALSE)
 
-write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
