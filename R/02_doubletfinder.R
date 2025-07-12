@@ -47,10 +47,15 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
   homotypic_prop <- modelHomotypic(sample_seurat@meta.data$Sample_name)
-  nExp_poi <- round(0.075 * nrow(sample_seurat@meta.data))
+  nExp_poi <- round((scConfig.expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
   nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
-  sample_seurat <- doubletFinder(sample_seurat, PCs = 1:10, pN = 0.25, pK = pK_value, nExp = nExp_poi, sct = FALSE)
+  sample_seurat <- doubletFinder(sample_seurat,
+                                 PCs = 1:10,
+                                 pN = 0.25,
+                                 pK = pK_value,
+                                 nExp = nExp_poi,
+                                 sct = FALSE)
 
   meta_cols <- colnames(sample_seurat@meta.data)
   score <- str_subset(meta_cols, "^pANN")

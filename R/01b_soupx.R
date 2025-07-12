@@ -4,6 +4,7 @@
 
 library(here)
 library(Seurat)
+library(dplyr)
 library(SoupX)
 library(foreach)
 library(doParallel)
@@ -23,7 +24,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores/2)
+cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
 
 # Place each sample in a list for further processing
@@ -83,7 +84,7 @@ top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seura
 }
 
 # Combine and write summary
-summary_df <- dplyr::bind_rows(top_ambient_genes)
+summary_df <- bind_rows(top_ambient_genes)
 write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
 
 # Log the completion time

@@ -45,6 +45,11 @@ scConfig.percent_mito_cutoff <- 5
 # Recommended = 5
 scConfig.percent_ribo_cutoff <- 5
 
+# expected_doublet_pct - Datatype: Int
+# Expected percentage of doublets in the dataset
+# Recommended = 7.5 (5 to 10%)
+scConfig.expct_doublet_pct <- 7.5
+
 # soupx_adjust - Datatype: Bool (TRUE/FALSE)
 # If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
 scConfig.soupx_adjust <- FALSE
