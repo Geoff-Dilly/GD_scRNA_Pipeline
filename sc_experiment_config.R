@@ -1,13 +1,13 @@
-# Experiment configuration file for Messing/Mayfield snRNA-seq analysis using Seurat
+# Experiment configuration file for Messing/Mayfield scRNA-seq analysis using Seurat
 # Written by Geoffrey A. Dilly in June 2024
 
 # Project_name - Datatype: String
 # Name of the project for Seurat
-scConfig.Project_name <- "GD_snRNA_Experiment"
+scConfig.Project_name <- "GD_scRNA_Experiment"
 
 # Project_name - Datatype: String
 # Prefix for filenames of R objects
-scConfig.Prefix <- "GD_snRNA"
+scConfig.Prefix <- "GD_scRNA"
 
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located

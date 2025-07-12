@@ -4,8 +4,8 @@
 
 library(here)
 library(Seurat)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -13,7 +13,7 @@ source("R/modules/log_utils.R")
 write_script_log("R/05b_rename_clusters.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/05b_rename_clusters.R")
 
 # Load the configuration file and metadata
@@ -78,4 +78,4 @@ Idents(combined_seurat) <- combined_seurat$seurat_clusters
 saveRDS(combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
 # Log the completion time
-write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

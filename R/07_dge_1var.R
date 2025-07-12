@@ -10,8 +10,8 @@ library(tidyverse)
 library(DESeq2)
 library(ggrepel)
 library(pheatmap)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -20,7 +20,7 @@ source("R/modules/log_utils.R")
 write_script_log("R/01b_soupx.R")
 
 # Log the start time and a time stamped copy of the script
-write(paste0("07_dge_1var - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("07_dge_1var - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/07_dge_1var.R")
 
 # Load the configuration file and metadata
@@ -205,4 +205,4 @@ stopCluster(cl)
 summary_df <- dplyr::bind_rows(summary_list)
 write.csv(summary_df, "CSV_Results/DEGs_All/DGE_summary.csv", row.names = FALSE)
 
-write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

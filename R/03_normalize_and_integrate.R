@@ -4,15 +4,15 @@
 
 library(here)
 library(Seurat)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
 ## Log the start time and a timestamped copy of the script
-write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/03_normalize_and_integrate.R")
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
@@ -95,4 +95,4 @@ integrated_seurat <- IntegrateData(
 saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
 
 # Log the completion time
-write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

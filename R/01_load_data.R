@@ -6,15 +6,15 @@ library(here)
 library(Seurat)
 library(foreach)
 library(doParallel)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("01_load_data - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/01_load_data.R")
 
 # Load the configuration file and metadata
@@ -64,4 +64,4 @@ foreach(sample = sample_list, .packages = c("Seurat")) %dopar% {
 stopCluster(cl)
 
 # Log the completion time
-write(paste0("01_load_data - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01_load_data - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

@@ -6,8 +6,8 @@ library(here)
 library(dplyr)
 library(Seurat)
 library(ggplot2)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -15,7 +15,7 @@ source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/05_id_marker_genes.R")
 
 # Load the configuration file and metadata
@@ -58,4 +58,4 @@ top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$g
 save_plot_pdf(top2markers_dotplot, "Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 8, width = 12)
 
 # Log the completion time
-write(paste0("05_id_marker_genes - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("05_id_marker_genes - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

@@ -6,8 +6,8 @@ library(here)
 library(dplyr)
 library(Seurat)
 library(ggplot2)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -15,7 +15,7 @@ source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("04_cluster_cells - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("04_cluster_cells - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/04_cluster_cells.R")
 
 # Load the configuration file and metadata
@@ -110,4 +110,4 @@ percent_mito_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_mito"
 save_plot_pdf(percent_mito_vln_by_animal, "Plots/Quality_Control/percentMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
 # Log the completion time
-write(paste0("04_cluster_cells - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("04_cluster_cells - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

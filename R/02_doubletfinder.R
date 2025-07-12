@@ -8,8 +8,8 @@ library(stringr)
 library(DoubletFinder)
 library(doParallel)
 library(foreach)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -17,7 +17,7 @@ source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/02_doubletfinder.R")
 
 # Read the sample metadata file
@@ -77,4 +77,4 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 stopCluster(cl)
 
 # Log the completion time
-write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

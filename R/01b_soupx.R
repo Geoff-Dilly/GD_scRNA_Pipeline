@@ -8,15 +8,15 @@ library(dplyr)
 library(SoupX)
 library(foreach)
 library(doParallel)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("01b_soupx - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01b_soupx - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/01b_soupx.R")
 
 # Load the configuration file and metadata
@@ -91,4 +91,4 @@ summary_df <- bind_rows(top_ambient_genes)
 write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
 
 # Log the completion time
-write(paste0("01b_soupx - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("01b_soupx - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

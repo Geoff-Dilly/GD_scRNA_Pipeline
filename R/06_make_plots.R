@@ -7,8 +7,8 @@ library(dplyr)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
-snRNA_home_dir <- here()
-setwd(snRNA_home_dir)
+scRNA_home_dir <- here()
+setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
@@ -16,7 +16,7 @@ source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
 # Log the start time and a timestamped copy of the script
-write(paste0("06_make_plots - Start: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("06_make_plots - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/06_make_plots.R")
 
 # Load the configuration file
@@ -220,4 +220,4 @@ mkr_stack_vln_plot <- make_stacked_vln_plot(seurat_obj = combined_seurat,
 save_plot_pdf(mkr_stack_vln_plot, "Plots/Clustering_Plots/marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Log the completion time
-write(paste0("06_make_plots - Finish: ", Sys.time()), file = "snRNA_Log.txt", append = TRUE)
+write(paste0("06_make_plots - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
