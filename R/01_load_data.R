@@ -12,7 +12,7 @@ scRNA_home_dir <- here()
 setwd(scRNA_home_dir)
 
 # For testing only!!!!
-scConfig.soupx_correct <- TRUE
+scConfig.compute_soupx <- TRUE
 
 # Setup ####
 # Load custom functions
@@ -57,7 +57,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
   sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig.Project_name, min.cells = 1, min.features = 1)
 
-  if (scConfig.soupx_correct == TRUE) {
+  if (scConfig.compute_soupx == TRUE) {
     # Load the unfiltered matrix for SoupX
     raw_matrix <- Read10X(file.path(sample$Raw_data_dir, "raw_feature_bc_matrix"))
 
@@ -66,10 +66,10 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
     sample_seurat <- RunPCA(sample_seurat, verbose = FALSE)
     sample_seurat <- FindNeighbors(sample_seurat, dims = 1:10)
     sample_seurat <- FindClusters(sample_seurat)
-    
+
     # Run SoupX
     soup_channel <- SoupChannel(tod = raw_matrix, toc = filt_matrix)
-    
+
     # Assign clusters to SoupX
     cluster_labels <- sample_seurat$seurat_clusters
     cell_names     <- rownames(sample_seurat@meta.data)
@@ -102,7 +102,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
 
 stopCluster(cl)
 
-if (scConfig.soupx_correct == TRUE) {
+if (scConfig.compute_soupx == TRUE) {
   # Combine and write SoupX summary
   summary_df <- bind_rows(top_ambient_genes)
   write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
