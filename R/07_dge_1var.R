@@ -31,6 +31,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
+on.exit(stopCluster(cl))
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
