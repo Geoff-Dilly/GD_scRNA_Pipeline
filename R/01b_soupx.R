@@ -35,53 +35,51 @@ str_sample_list <- scConfig.Sample_metadata$Sample_name
 # Code adapted from https://cellgeni.github.io/notebooks/html/new-10kPBMC-SoupX.html
 
 # Run SoupX ####
-# Process each sample
-top_ambient_genes <- foreach(sample_name = str_sample_list, .packages = c("Seurat", "SoupX")) %dopar% {
+top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "SoupX", "dplyr")) %dopar% {
 
-  # Read the sample Seurat object
-  sample_seurat <- LoadSeuratRds(paste0("R_Data/", sample_name, "_seurat.rds"))
+  sample_name <- sample$Sample_name
+  raw_dir     <- sample$Raw_data_dir
 
   # Read the raw and filtered matrices for SoupX
-  filt_matrix <- Read10X(paste0(sample$Raw_data_dir, "filtered_feature_bc_matrix/"))
-  raw_matrix <- Read10X(paste0(sample$Raw_data_dir, "raw_feature_bc_matrix/"))
+  filt_matrix <- Read10X(file.path(raw_dir, "filtered_feature_bc_matrix"))
+  raw_matrix  <- Read10X(file.path(raw_dir, "raw_feature_bc_matrix"))
 
-  # Cluster the Seurat object
-  sample_seurat <- SCTransform(sample_seurat, verbose = TRUE)
-  sample_seurat <- RunPCA(sample_seurat, verbose = TRUE)
-  sample_seurat <- RunUMAP(sample_seurat, dims = 1:30, verbose = TRUE)
-  sample_seurat <- FindNeighbors(sample_seurat, dims = 1:30, verbose = TRUE)
-  sample_seurat <- FindClusters(sample_seurat, verbose = TRUE)
+  # Create Seurat object from *all* cells in filtered matrix
+  seurat_all <- CreateSeuratObject(counts = filt_matrix, project = sample_name)
 
-  # Create the SoupX channel
-  soup_channel <- SoupChannel(raw_matrix, filt_matrix)
+  # Perform minimal clustering (on all barcodes) for SoupX if you wish
+  seurat_all <- NormalizeData(seurat_all)
+  seurat_all <- FindVariableFeatures(seurat_all)
+  seurat_all <- ScaleData(seurat_all)
+  seurat_all <- RunPCA(seurat_all)
+  seurat_all <- FindNeighbors(seurat_all, dims = 1:10)
+  seurat_all <- FindClusters(seurat_all, resolution = 0.5)
+  meta <- seurat_all@meta.data
 
-  # Extract metadata and UMAP coordinates
-  meta <- sample_seurat@meta.data
-  umap <- sample_seurat@reductions$umap@cell.embeddings
+  # Create SoupX channel
+  soup_channel <- SoupChannel(tod = raw_matrix, toc = filt_matrix)
 
-  # Assign clustering to SoupX
-  soup_channel <- setClusters(soup_channel, setNames(meta$seurat_clusters, rownames(meta)))
-  soup_channel <- setDR(soup_channel, umap)
+  # Robust barcode matching for clusters
+  valid_barcodes <- intersect(rownames(meta), soupChannelCells(soup_channel))
+  clusters_for_soupx <- setNames(meta$seurat_clusters[valid_barcodes], valid_barcodes)
+  soup_channel <- setClusters(soup_channel, clusters_for_soupx)
 
-  # Estimate and apply the SoupX correction
+  # Optionally, add DR coordinates
+  # seurat_all <- RunUMAP(seurat_all, dims = 1:10)
+  # umap <- seurat_all@reductions$umap@cell.embeddings
+  # soup_channel <- setDR(soup_channel, umap[valid_barcodes, ])
+
+  # Estimate and apply SoupX correction
   soup_channel <- autoEstCont(soup_channel)
   adj_matrix <- adjustCounts(soup_channel, roundToInt = TRUE)
 
-  # Add as new assay
-  sample_seurat[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
-
-  # Sort soupProfile by estimated contamination and take the top 10
+  # Save the top ambient genes
   top_ambient <- head(soup_channel$soupProfile[order(soup_channel$soupProfile$est, decreasing = TRUE), ], n = 10)
   top_ambient$Sample <- sample_name
 
-  # Reload the original Seurat object (before clustering/SCT/UMAP)
-  orig_seurat <- readRDS(paste0("R_Data/", sample_name, "_seurat.rds"))
-
-  # Add the SoupX assay
-  orig_seurat[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
-
-  # Save the Seurat object with SoupX results
-  saveRDS(orig_seurat, file = paste0("R_Data/", sample_name, "_seurat.rds"))
+  # Save a Seurat object with the SoupX assay (no filtering yet!)
+  seurat_all[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
+  saveRDS(seurat_all, file = paste0("R_Data/", sample_name, "_seurat_SoupX.rds"))
 
   top_ambient
 }
