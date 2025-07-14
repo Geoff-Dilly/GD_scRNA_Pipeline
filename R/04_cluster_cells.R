@@ -33,9 +33,12 @@ write.csv(cells_per_sample, "CSV_Results/Cells_per_sample.csv")
 qc_violins_plot <- VlnPlot(combined_seurat, features = c("nFeature_RNA", "nCount_RNA", "percent_mito", "Doublet_Score"), ncol = 4, pt.size = 0)
 save_plot_pdf(qc_violins_plot, "Plots/Quality_Control/QC_Violins.pdf", height = 4, width = 12)
 
+# Remove exogenous genes from variable features
+VariableFeatures(combined_seurat) <- setdiff(VariableFeatures(combined_seurat), scConfig.exogenous_genes)
+
 # Scale data and run UMAP ####
 # Perform PCA
-combined_seurat <- RunPCA(combined_seurat, npcs = 100, verbose = TRUE)
+combined_seurat <- RunPCA(combined_seurat, features = VariableFeatures(combined_seurat), npcs = 100, verbose = TRUE)
 
 # Visualize the dimensionality of the PCs and pick the number of PCs
 dimheatmaps_plot <- DimHeatmap(combined_seurat, dims = 1:9, cells = 500, balanced = TRUE)
