@@ -49,8 +49,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 ### R Scripts
 | Script | Description | Output |
 |---|---|---|
-| 01_load_data.R | Load sample data, metadata, and basic QC | Sample-level Seurat object |
-| 01b_soupx.R | *Optional:* Run SoupX on each sample | Sample-level Seurat object |
+| 01_load_data.R | Load sample data, metadata, run SoupX, and basic QC | Sample-level Seurat object |
 | 02_doubletfinder.R | Run DoubletFinder on each sample | Sample-level Seurat object |
 | 03_normalize_and_integrate.R | Integrate samples and normalize with scTransform | Experiment-level Seurat objects |
 | 04_cluster_cells.R | Perform dimensional reduction and clustering analysis | Experiment-level Seurat object |
