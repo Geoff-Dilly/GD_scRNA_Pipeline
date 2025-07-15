@@ -210,7 +210,7 @@ qc_by_cluster_vln_plot <- VlnPlot(
   pt.size = 0, stack = TRUE, flip = TRUE
 ) + NoLegend()
 
-save_plot_pdf(QC_bycluster_vln_plot, "Plots/Quality_Control/QC_byCluster_VlnPlot.pdf", height = 4, width = 12)
+save_plot_pdf(qc_by_cluster_vln_plot, "Plots/Quality_Control/QC_byCluster_VlnPlot.pdf", height = 4, width = 12)
 
 # Marker gene plots ####
 # Load the marker genes previously identified with FindAllMarkers()

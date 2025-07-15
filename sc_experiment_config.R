@@ -17,8 +17,6 @@ scConfig.Home_folder <-   "__HOME_DIR__"
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data
 # Should contain data that can be read by the Read10X() function in Seurat
-# Data should be located at <Raw_data_folder>/<Sample_name>/<Sample_name>/outs/filtered_feature_bc_matrix
-# In order to run SoupX, .../unfiltered_feature_bc_matrix is also necessary
 scConfig.Raw_data_folder <- "Raw_Data"
 
 # mito_pattern - Datatype: String
