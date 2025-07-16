@@ -11,7 +11,6 @@ dependencies:
   - r-soupx
   - r-doparallel
   - bioconductor-deseq2
-  - bioconductor-glmgampoi
   - r-pheatmap
   - r-tidyverse
   - r-ggplot2
@@ -22,3 +21,7 @@ dependencies:
 # After activating your environment, run:
 # Rscript -e 'devtools::install_github("chris-mcginnis-ucsf/DoubletFinder")'
 # Rscript -e 'devtools::install_github("immunogenomics/presto")'
+
+# glmGamPoi is a Bioconductor package that needs to be installed separately
+# It causes issues in MacOS otherwise, so it is recommended to install it after activating the environment
+# Rscript -e 'BiocManager::install("glmGamPoi")'
