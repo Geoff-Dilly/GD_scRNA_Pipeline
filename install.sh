@@ -95,6 +95,10 @@ scConfig.percent_ribo_cutoff <- 5
 # Recommended = 7.5 (5 to 10%)
 scConfig.expct_doublet_pct <- 7.5
 
+# compute_soupx - Datatype: Bool (TRUE/FALSE)
+# If TRUE, soupX will be run on the raw data
+scConfig.compute_soupx <- FALSE
+
 # soupx_adjust - Datatype: Bool (TRUE/FALSE)
 # If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
 scConfig.soupx_adjust <- FALSE
@@ -126,6 +130,10 @@ scConfig.clustering_resolution <- 0.5
 # cluster_plot_ident - Datatype: String
 # Identity used by cluster and DGE plots
 scConfig.cluster_plot_ident <- "seurat_clusters"
+
+# exogenous_genes - Datatype: List of Strings
+# List of exogenous genes to be excluded from clustering
+scConfig.exogenous_genes <- c()
 
 EOF
 fi

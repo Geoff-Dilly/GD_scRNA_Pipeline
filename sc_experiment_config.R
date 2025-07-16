@@ -17,8 +17,6 @@ scConfig.Home_folder <-   "__HOME_DIR__"
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data
 # Should contain data that can be read by the Read10X() function in Seurat
-# Data should be located at <Raw_data_folder>/<Sample_name>/<Sample_name>/outs/filtered_feature_bc_matrix
-# In order to run SoupX, .../unfiltered_feature_bc_matrix is also necessary
 scConfig.Raw_data_folder <- "Raw_Data"
 
 # mito_pattern - Datatype: String
@@ -49,6 +47,10 @@ scConfig.percent_ribo_cutoff <- 5
 # Expected percentage of doublets in the dataset
 # Recommended = 7.5 (5 to 10%)
 scConfig.expct_doublet_pct <- 7.5
+
+# compute_soupx - Datatype: Bool (TRUE/FALSE)
+# If TRUE, soupX will be run on the raw data
+scConfig.compute_soupx <- FALSE
 
 # soupx_adjust - Datatype: Bool (TRUE/FALSE)
 # If TRUE, use SoupX to adjust the raw counts for ambient RNA contamination
@@ -81,3 +83,7 @@ scConfig.clustering_resolution <- 0.5
 # cluster_plot_ident - Datatype: String
 # Identity used by cluster and DGE plots
 scConfig.cluster_plot_ident <- "seurat_clusters"
+
+# exogenous_genes - Datatype: List of Strings
+# List of exogenous genes to be excluded from clustering
+scConfig.exogenous_genes <- c("eGFP", "Cre")

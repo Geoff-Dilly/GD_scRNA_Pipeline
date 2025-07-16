@@ -27,10 +27,14 @@ write_script_log("R/07_dge_1var.R")
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Define the cluster identity for plotting and DGE analysis
+cluster_col <- scConfig.cluster_plot_ident
+
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores / 2)
 registerDoParallel(cl)
+on.exit(stopCluster(cl))
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
@@ -48,16 +52,16 @@ if (scConfig.soupx_adjust == TRUE) {
 
 # Create pseudobulked seurat object
 pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = dge_assay, return.seurat = TRUE,
-                                           group.by = c("Treatment", "Sample_name", "seurat_clusters"))
+                                           group.by = c("Treatment", "Sample_name", cluster_col))
 
-pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat$seurat_clusters, sep = "_")
+pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat[[cluster_col]][,1], sep = "_")
 
 Idents(pseudobulked_seurat) <- "celltype.treatment"
 
 colnames_vec <- colnames(pseudobulked_seurat$RNA)
 
 # Get clusters and conditions
-clusters <- unique(pseudobulked_seurat$seurat_clusters)
+clusters <- unique(pseudobulked_seurat[[cluster_col]][,1])
 conditions <- unique(pseudobulked_seurat$Treatment)
 
 # DGE analysis and plotting ####

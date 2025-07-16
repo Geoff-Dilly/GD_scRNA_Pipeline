@@ -20,7 +20,8 @@ source("R/modules/log_utils.R")
 write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/02_doubletfinder.R")
 
-# Read the sample metadata file
+# Load the configuration file and metadata
+source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Setup parallel backend
