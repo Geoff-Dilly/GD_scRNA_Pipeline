@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# setup_env.sh — Set up conda environment for single-cell RNA-seq analysis pipeline
 # Anaconda is required for this script
 # Set up bioconda and conda-forge prior to running 
 
@@ -18,20 +19,9 @@ ENV_NAME="sc_analysis_env"
 # Source conda in the current shell for 'conda activate'
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
-# Creates a new Conda environment with the specified name
-conda create -y -n $ENV_NAME -c conda-forge r-base=4.3.3 \
-r-essentials r-devtools 
-
-# Install all required conda-forge packages
-conda install -y -n $ENV_NAME -c conda-forge r-seurat r-soupx r-doparallel 
-
-# Install all required bioconductor packages
-conda install -y -n $ENV_NAME -c bioconda \
-bioconductor-deseq2 bioconductor-glmgampoi \
-r-pheatmap
-
-# Activate the new environment
-conda activate sc_analysis_env
+# Create the conda environment from the YAML file
+conda env create -f sc_analysis_env.yaml
+conda activate $ENV_NAME
 
 # Install packages from GITHUB
 Rscript -e 'devtools::install_github("chris-mcginnis-ucsf/DoubletFinder")'

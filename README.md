@@ -10,7 +10,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 ## Contents
 
 - `install.sh`: Bash script to generate the recommended file structure in a local directory. 
-- `make_environment.sh`: Bash script to make an Anaconda environment with the appropriate dependencies.
+- `setup_env.sh`: Bash script to make an Anaconda environment with the appropriate dependencies.
 - `sc_analysis_env.yaml`: YAML containing Anaconda dependencies.
 - `R/`: R scripts for data processing, clustering, cell identification, visualization, and DGE.
 - `run_pipeline.sh`: Editable Bash script to run the R scripts in order.
@@ -43,7 +43,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 | Script | Description |
 |---|---|
 | install.sh | Generate the recommended file structure | 
-| make_environment.sh | Creates an Anaconda environment | 
+| setup_env.sh | Set up conda environment for analysis pipeline | 
 | run_pipeline.sh | Run the R scripts in order | 
 
 ### R Scripts
