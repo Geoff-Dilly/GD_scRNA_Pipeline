@@ -97,7 +97,7 @@ Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
 - R = 4.3.3
 - Seurat ≥ 5.0
 - Anaconda
-- See `sc_analysis_env.yaml` for environment dependencies
+- See `sc_analysis_env.yaml` for dependencies
 
 ## Acknowledgements
 
