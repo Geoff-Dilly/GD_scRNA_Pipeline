@@ -17,6 +17,7 @@ scConfig.compute_soupx <- TRUE
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
+source("R/modules/soupx_utils.R")
 
 # Log the start time and a timestamped copy of the script
 write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
@@ -58,32 +59,9 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig.Project_name, min.cells = 1, min.features = 1)
 
   if (scConfig.compute_soupx == TRUE) {
-    # Load the unfiltered matrix for SoupX
-    raw_matrix <- Read10X(file.path(sample$Raw_data_dir, "raw_feature_bc_matrix"))
-
-    # Minimally cluster the seurat object
-    sample_seurat <- SCTransform(sample_seurat, verbose = FALSE)
-    sample_seurat <- RunPCA(sample_seurat, verbose = FALSE)
-    sample_seurat <- FindNeighbors(sample_seurat, dims = 1:10)
-    sample_seurat <- FindClusters(sample_seurat)
-
-    # Run SoupX
-    soup_channel <- SoupChannel(tod = raw_matrix, toc = filt_matrix)
-
-    # Assign clusters to SoupX
-    cluster_labels <- sample_seurat$seurat_clusters
-    cell_names     <- rownames(sample_seurat@meta.data)
-    soup_channel   <- setClusters(soup_channel, setNames(cluster_labels, cell_names))
-
-    soup_channel <- autoEstCont(soup_channel)
-    adj_matrix   <- adjustCounts(soup_channel, roundToInt = TRUE)
-
-    # Add the SoupX results as a new assay
-    sample_seurat[["SoupX"]] <- CreateAssayObject(counts = adj_matrix)
-
-    # Save the top ambient genes
-    top_ambient <- head(soup_channel$soupProfile[order(soup_channel$soupProfile$est, decreasing = TRUE), ], n = 10)
-    top_ambient$Sample <- sample$Sample_name
+    soupx_results <- run_soupx_correction(sample, sample_seurat)
+    sample_seurat <- soupx_results$seurat_obj
+    top_ambient <- soupx_results$top_ambient
   }
 
   # Filter the Seurat object for QC and add metadata
@@ -97,7 +75,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   }
   saveRDS(sample_seurat, file = paste0("R_Data/", sample$Sample_name, "_seurat.rds"))
 
-  top_ambient
+  return(top_ambient)
 }
 
 stopCluster(cl)
@@ -105,7 +83,7 @@ stopCluster(cl)
 if (scConfig.compute_soupx == TRUE) {
   # Combine and write SoupX summary
   summary_df <- bind_rows(top_ambient_genes)
-  write.csv(summary_df, "CSV_Results/DEGs_All/Ambient_genes_summary.csv", row.names = FALSE)
+  write.csv(summary_df, "CSV_Results/Ambient_genes_summary.csv", row.names = FALSE)
 }
 
 # Log the completion time
