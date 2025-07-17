@@ -3,16 +3,14 @@
 #' @title Write Script Log
 #' @description This function writes a log of the script execution,
 #' @description including the script content, configuration file, and session info.
-write_script_log <- function(script_file) {
-  config_file <- "sc_experiment_config.R"
+write_script_log <- function(script_file, config_file = "sc_experiment_config.R", log_dir = "Logs/") {
   timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
 
   # Open a log file in the Logs directory
-  log_file <- paste0("Logs/Time_", timestamp, "_Script_Log_",
-                     tools::file_path_sans_ext(basename(script_file)), ".txt")
+  log_file <- file.path(log_dir, paste0("Time_", timestamp, "_Script_Log_",
+                     tools::file_path_sans_ext(basename(script_file)), ".txt"))
 
   log_connection <- file(log_file, open = "wt")
-  on.exit(close(log_connection))
 
   # Write the script to the log file
   writeLines("Script Log:\n", log_connection)
@@ -28,7 +26,7 @@ write_script_log <- function(script_file) {
   capture.output(sessionInfo(), file = log_connection)
   writeLines("\n\n====================================================================\n\n", log_connection)
 
-  return(log_file)
+  return(log_connection)
 }
 
 #' @title Check Required Directories
