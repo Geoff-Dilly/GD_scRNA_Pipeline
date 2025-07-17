@@ -38,10 +38,11 @@ check_required_dirs <- function() {
                      "Plots/DESEQ_Plots/Heatmaps", "Plots/DESEQ_Plots/MA_Plots", "Plots/DESEQ_Plots/PCAs",
                      "Plots/DESEQ_Plots/Volcano_Plots", "Plots/Quality_Control", "R_Data", "Logs")
 
-  for (dir in required_dirs) {
-    if (!dir.exists(dir)) {
-      message(paste("Directory", dir, "does not exist."))
-      stop("Required directories are missing. Please run install.sh to set up the directory structure.")
-    }
+  missing_dirs <- required_dirs[!dir.exists(required_dirs)]
+
+  if (length(missing_dirs) > 0) {
+    message("The following required directories are missing:\n",
+            paste(missing_dirs, collapse = "\n"))
+    stop("Required directories are missing. Please run install.sh to set up the directory structure.")
   }
 }
