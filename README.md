@@ -16,6 +16,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - `run_pipeline.sh`: Editable Bash script to run the R scripts in order.
 - `sc_experiment_config.R`: R configuration file to set pipeline parameters.
 - `sc_sample_metadata.csv`: Metadata CSV file for identifying and labeling samples.
+- `reference/marker_gene_db.csv`: A CSV database of sets of marker genes for cluster analysis.
 
 ## Usage
 
@@ -28,13 +29,18 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
     ```sh
     bash install.sh
     ```
-3. **Setup metadata and configuration:**
+3. **Set up Conda environment:**
+    ```sh
+    bash setup_env.sh
+    conda activate sc_analysis_env
+    ```
+4. **Set up metadata and configuration:**
    Edit `sc_experiment_config.R` and `sc_sample_metadata.csv` as needed
-4. **Run the analysis pipeline:**
+5. **Run the analysis pipeline:**
     ```sh
     bash run_pipeline.sh
     ```
-5. **Examine outputs:**
+6. **Examine outputs:**
    View plots, results, and logs.
 
 ## Scripts
