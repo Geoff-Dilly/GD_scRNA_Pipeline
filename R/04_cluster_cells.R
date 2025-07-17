@@ -93,27 +93,11 @@ save_plot_pdf(doublet_score_vln_plot, "Plots/Clustering_Plots/Doublet_Score_Viol
 
 # Visualize marker gene expression ####
 # Using markers from Dilly et al. 2022
-id_features <- c("Mbp", "Mobp", "Plp1", "Gad1", "Gad2",
-                 "Ndrg2", "Slc1a2", "Slc4a4",
-                 "Slc17a7", "Satb1", "Neurod6", "Vcan",
-                 "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
-                 "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153",
-                 "Rsph1", "Tmem212", "Rbfox3")
+marker_tbl <- read.csv("marker_genes_db.csv", stringsAsFactors = FALSE)
+marker_genes <- marker_tbl %>% filter(reference == scConfig.marker_gene_reference) %>% pull(gene)
 
-major_cells_dotplot <- DotPlot(combined_seurat, features = id_features) + RotatedAxis()
+major_cells_dotplot <- DotPlot(combined_seurat, features = marker_genes) + RotatedAxis()
 save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_Cell_Types_DotPlot.pdf", height = 6, width = 8)
-
-# Examine QC metrics by animal ####
-Idents(combined_seurat) <- combined_seurat$Sample_name
-
-nFeature_vln_by_animal <- VlnPlot(combined_seurat, features = "nFeature_RNA", pt.size = 0) # nolint
-save_plot_pdf(nFeature_vln_by_animal, "Plots/Quality_Control/nFeature_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
-
-nCount_vln_by_animal <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0) # nolint
-save_plot_pdf(nCount_vln_by_animal, "Plots/Quality_Control/nCount_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
-
-percent_mito_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_mito", pt.size = 0)
-save_plot_pdf(percent_mito_vln_by_animal, "Plots/Quality_Control/percentMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
 # Log the completion time
 write(paste0("04_cluster_cells - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

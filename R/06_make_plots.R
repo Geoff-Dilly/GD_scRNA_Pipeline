@@ -229,7 +229,7 @@ top_markers2 <- all_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2
 top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
 save_plot_pdf(top2markers_dotplot, "Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 12, width = 18)
 
-# Make a stacked violin plot for the DS marker genes
+# Make a stacked violin plot for the top 2 marker genes
 marker_stack_vln_plot <- make_stacked_vln_plot(
   seurat_obj = combined_seurat,
   features = unique(top_markers2$gene),
@@ -241,18 +241,15 @@ marker_stack_vln_plot <- make_stacked_vln_plot(
 )
 save_plot_pdf(marker_stack_vln_plot, "Plots/Clustering_Plots/Top_Marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
-# Load markers from Dilly et al 2022
-major_marker_genes_list <- c(
-  "Mbp", "Mobp", "Plp1", "Gad1", "Gad2", "Ndrg2", "Slc1a2", "Slc4a4",
-  "Slc17a7", "Satb1", "Neurod6", "Vcan", "Pdgfra", "Pcdh15", "Csf1r", "Apbb1ip", "P2ry12",
-  "Flt1", "B2m", "Bmp4", "Cnp", "Ccdc153", "Rsph1", "Tmem212", "Rbfox3"
-)
-major_marker_genes_unique <- unique(unlist(major_marker_genes_list))
+# Load markers from the marker genes database
+marker_tbl <- read.csv("marker_genes_db.csv", stringsAsFactors = FALSE)
+major_marker_genes <- marker_tbl %>% filter(reference == scConfig.marker_gene_reference) %>% pull(gene)
 
+major_marker_genes_unique <- unique(unlist(major_marker_genes))
 major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()
 save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_cells_dotplot.pdf", height = 4, width = 6)
 
-# Make a stacked violin plot for the DS marker genes
+# Make a stacked violin plot for the brain marker genes
 brain_marker_stack_vln_plot <- make_stacked_vln_plot(
   seurat_obj = combined_seurat,
   features = major_marker_genes_unique,
@@ -264,50 +261,8 @@ brain_marker_stack_vln_plot <- make_stacked_vln_plot(
 )
 save_plot_pdf(brain_marker_stack_vln_plot, "Plots/Clustering_Plots/Brainmarker_stacked_vln_plot.pdf", height = 12, width = 4)
 
-# DS Cell Subtypes
-# From Wildermuth et al 2025
-dSPN      <- c("Drd1", "Pdyn")
-iSPN      <- c("Drd2", "Adora2a")
-eSPN      <- c("Otof", "Col11a1")
-PVALB_IN  <- c("Kit", "Pvalb")
-Chol_IN   <- c("Tacr1", "Chat")
-SST_IN    <- c("Sst", "Npy")
-Astro     <- c("Slc1a3", "Rorb")
-Oligo     <- c("Mog", "Aspa")
-OPC       <- c("Pdgfra")
-Endo      <- c("Flt1", "Slco1a4")
-Ependy    <- c("Dnah12", "Rsph1", "Gm973")
-Mural     <- c("Pdgfrb", "Rgs5")
-Microglia <- c("C1qc", "Cx3cr1")
-
-DS_cell_types <- c(
-  dSPN, iSPN, eSPN, PVALB_IN, Chol_IN, SST_IN,
-  Astro, Oligo, OPC, Endo, Ependy, Mural, Microglia
-)
-
-DS_marker_genes_list <- list(
-  dSPN, iSPN, eSPN, PVALB_IN, Chol_IN, SST_IN,
-  Astro, Oligo, OPC, Endo, Ependy, Mural, Microglia
-)
-DS_marker_genes_unique <- unique(unlist(DS_marker_genes_list))
-
-DS_cells_dotplot <- DotPlot(combined_seurat, features = DS_marker_genes_unique) + RotatedAxis()
-save_plot_pdf(DS_cells_dotplot, "Plots/Clustering_Plots/DS_markers_dotplot.pdf", height = 4, width = 6)
-
-# Make a stacked violin plot for the DS marker genes
-DS_marker_stack_vln_plot <- make_stacked_vln_plot(
-  seurat_obj = combined_seurat,
-  features = DS_marker_genes_unique,
-  assay = "SCT",
-  slot = "data",
-  adjust = 2.5,
-  pt.size = 0,
-  gene_label_size = 8
-)
-save_plot_pdf(DS_marker_stack_vln_plot, "Plots/Clustering_Plots/DS_marker_stacked_vln_plot.pdf", height = 12, width = 4)
-
 # Generate featureplots and violinplots for genes of interest
-all_markers_list <- c(major_marker_genes_unique, DS_marker_genes_unique)
+all_markers_list <- c(major_marker_genes_unique)
 
 for (marker in all_markers_list) {
   gene_feature_plot <- FeaturePlot(combined_seurat, features = marker)

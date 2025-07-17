@@ -97,5 +97,17 @@ integrated_seurat <- IntegrateData(
 
 saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
 
+# Examine QC metrics by animal ####
+Idents(combined_seurat) <- combined_seurat$Sample_name
+
+nFeature_vln_by_animal <- VlnPlot(combined_seurat, features = "nFeature_RNA", pt.size = 0) # nolint
+save_plot_pdf(nFeature_vln_by_animal, "Plots/Quality_Control/nFeature_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
+
+nCount_vln_by_animal <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0) # nolint
+save_plot_pdf(nCount_vln_by_animal, "Plots/Quality_Control/nCount_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
+
+percent_mito_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_mito", pt.size = 0)
+save_plot_pdf(percent_mito_vln_by_animal, "Plots/Quality_Control/percentMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
+
 # Log the completion time
 write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
