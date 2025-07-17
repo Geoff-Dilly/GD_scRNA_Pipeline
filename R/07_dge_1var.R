@@ -23,7 +23,15 @@ check_required_dirs()
 
 # Log the start time and a time stamped copy of the script
 write(paste0("07_dge_1var - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/07_dge_1var.R")
+log_file <- write_script_log("R/07_dge_1var.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -35,8 +43,8 @@ cluster_col <- scConfig.cluster_plot_ident
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores / 2)
-registerDoParallel(cl)
 on.exit(stopCluster(cl))
+registerDoParallel(cl)
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file

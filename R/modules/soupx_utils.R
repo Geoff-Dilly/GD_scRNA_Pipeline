@@ -1,3 +1,5 @@
+# soupx_utils.R
+
 #' @title Run SoupX Correction
 #' @description Run SoupX on an unfiltered Seurat object and add as assay
 run_soupx_correction <- function(sample, seurat_obj) {

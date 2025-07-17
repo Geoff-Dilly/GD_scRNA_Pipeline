@@ -16,7 +16,15 @@ check_required_dirs()
 
 ## Log the start time and a timestamped copy of the script
 write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/03_normalize_and_integrate.R")
+log_file <- write_script_log("R/03_normalize_and_integrate.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
 Sys.setenv("R_MAX_VSIZE" = 32000000000)
@@ -98,15 +106,15 @@ integrated_seurat <- IntegrateData(
 saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
 
 # Examine QC metrics by animal ####
-Idents(combined_seurat) <- combined_seurat$Sample_name
+Idents(integrated_seurat) <- integrated_seurat$Sample_name
 
-nFeature_vln_by_animal <- VlnPlot(combined_seurat, features = "nFeature_RNA", pt.size = 0) # nolint
+nFeature_vln_by_animal <- VlnPlot(integrated_seurat, features = "nFeature_RNA", pt.size = 0) # nolint
 save_plot_pdf(nFeature_vln_by_animal, "Plots/Quality_Control/nFeature_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
-nCount_vln_by_animal <- VlnPlot(combined_seurat, features = "nCount_RNA", pt.size = 0) # nolint
+nCount_vln_by_animal <- VlnPlot(integrated_seurat, features = "nCount_RNA", pt.size = 0) # nolint
 save_plot_pdf(nCount_vln_by_animal, "Plots/Quality_Control/nCount_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
-percent_mito_vln_by_animal <- VlnPlot(combined_seurat, features = "percent_mito", pt.size = 0)
+percent_mito_vln_by_animal <- VlnPlot(integrated_seurat, features = "percent_mito", pt.size = 0)
 save_plot_pdf(percent_mito_vln_by_animal, "Plots/Quality_Control/percentMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
 # Log the completion time

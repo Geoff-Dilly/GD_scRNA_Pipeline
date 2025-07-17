@@ -1,4 +1,4 @@
-
+# log_utils.R
 
 #' @title Write Script Log
 #' @description This function writes a log of the script execution,
@@ -12,23 +12,23 @@ write_script_log <- function(script_file) {
                      tools::file_path_sans_ext(basename(script_file)), ".txt")
 
   log_connection <- file(log_file, open = "wt")
+  on.exit(close(log_connection))
 
   # Write the script to the log file
-  writeLines(paste("Script Log:\n"), log_connection)
+  writeLines("Script Log:\n", log_connection)
   writeLines(readLines(script_file), log_connection)
-  writeLines("\n====================================================================\n", log_connection)
+  writeLines("\n\n====================================================================\n\n", log_connection)
 
   # Write the configuration file and session info
-  writeLines(paste("Config Log:\n"), log_connection)
+  writeLines("Config Log:\n", log_connection)
   writeLines(readLines(config_file), log_connection)
-  writeLines("\n====================================================================\n", log_connection)
-
+  writeLines("\n\n====================================================================\n\n", log_connection)
 
   writeLines("Session info:\n", log_connection)
   capture.output(sessionInfo(), file = log_connection)
+  writeLines("\n\n====================================================================\n\n", log_connection)
 
-  # Close the log file connection
-  close(log_connection)
+  return(log_file)
 }
 
 #' @title Check Required Directories

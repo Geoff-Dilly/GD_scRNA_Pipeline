@@ -21,7 +21,15 @@ check_required_dirs()
 
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/06_make_plots.R")
+log_file <- write_script_log("R/06_make_plots.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
 
 # Load the configuration file
 source("sc_experiment_config.R")
@@ -242,12 +250,12 @@ marker_stack_vln_plot <- make_stacked_vln_plot(
 save_plot_pdf(marker_stack_vln_plot, "Plots/Clustering_Plots/Top_Marker_stacked_vln_plot.pdf", height = 12, width = 4)
 
 # Load markers from the marker genes database
-marker_tbl <- read.csv("marker_genes_db.csv", stringsAsFactors = FALSE)
+marker_tbl <- read.csv("reference/marker_gene_db.csv", stringsAsFactors = FALSE)
 major_marker_genes <- marker_tbl %>% filter(reference == scConfig.marker_gene_reference) %>% pull(gene)
 
 major_marker_genes_unique <- unique(unlist(major_marker_genes))
 major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()
-save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_cells_dotplot.pdf", height = 4, width = 6)
+save_plot_pdf(major_cells_dotplot, "Plots/Clustering_Plots/Major_cells_dotplot.pdf", height = 10, width = 12)
 
 # Make a stacked violin plot for the brain marker genes
 brain_marker_stack_vln_plot <- make_stacked_vln_plot(
@@ -269,14 +277,14 @@ for (marker in all_markers_list) {
   save_plot_pdf(
     gene_feature_plot,
     paste0("Plots/Clustering_Plots/Marker_Feature_Plots/", marker, "_FeaturePlot.pdf"),
-    height = 4, width = 6
+    height = 6, width = 8
   )
 
   gene_violin_plot <- VlnPlot(combined_seurat, features = marker, pt.size = 0) + NoLegend()
   save_plot_pdf(
     gene_violin_plot,
     paste0("Plots/Clustering_Plots/Marker_Violin_Plots/", marker, "_ViolinPlot.pdf"),
-    height = 4, width = 6
+    height = 6, width = 8
   )
 }
 

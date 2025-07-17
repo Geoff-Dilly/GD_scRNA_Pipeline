@@ -19,7 +19,15 @@ check_required_dirs()
 
 # Log the start time and a timestamped copy of the script
 write(paste0("05_id_marker_genes - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/05_id_marker_genes.R")
+log_file <- write_script_log("R/05_id_marker_genes.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")

@@ -21,7 +21,15 @@ check_required_dirs()
 
 # Log the start time and a timestamped copy of the script
 write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/01_load_data.R")
+log_file <- write_script_log("R/01_load_data.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
@@ -30,24 +38,16 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 # Setup parallel backend
 n_cores <- parallel::detectCores() - 1
 cl <- makeCluster(n_cores / 2)
-registerDoParallel(cl)
 on.exit(stopCluster(cl))
+registerDoParallel(cl)
+
 
 # Check for required metadata columns
-if (!("Sample_name" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Sample_name> is not present")
-}
-
-if (!("Treatment" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Treatment> is not present")
-}
-
-if (!("Sex" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Sex> is not present")
-}
-
-if (!("Raw_data_dir" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Raw_data_dir> is not present")
+mandatory_metadata_columns <- c("Sample_name", "Treatment", "Sex", "Raw_data_dir")
+for (col in mandatory_metadata_columns) {
+  if (!col %in% colnames(scConfig.Sample_metadata)) {
+    stop(paste("Missing mandatory metadata column:", col))
+  }
 }
 
 # Load data and run SoupX (optional) ####
@@ -73,7 +73,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
-  saveRDS(sample_seurat, file = paste0("R_Data/", sample$Sample_name, "_seurat.rds"))
+  saveRDS(sample_seurat, file = paste0("R_Data", sample$Sample_name, "_seurat.rds"))
 
   return(top_ambient)
 }
