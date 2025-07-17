@@ -16,6 +16,9 @@ setwd(scRNA_home_dir)
 source("R/modules/log_utils.R")
 source("R/modules/soupx_utils.R")
 
+# Check for required directories
+check_required_dirs()
+
 # Log the start time and a timestamped copy of the script
 write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/01_load_data.R")

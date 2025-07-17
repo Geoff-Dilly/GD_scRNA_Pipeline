@@ -11,6 +11,9 @@ setwd(scRNA_home_dir)
 # Load custom functions
 source("R/modules/log_utils.R")
 
+# Check for required directories
+check_required_dirs()
+
 ## Log the start time and a timestamped copy of the script
 write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
 write_script_log("R/03_normalize_and_integrate.R")
