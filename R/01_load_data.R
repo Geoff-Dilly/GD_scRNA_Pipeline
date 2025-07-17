@@ -73,7 +73,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
-  saveRDS(sample_seurat, file = paste0("R_Data", sample$Sample_name, "_seurat.rds"))
+  saveRDS(sample_seurat, file = file.path("R_Data", paste0(sample$Sample_name, "_seurat.rds")))
 
   return(top_ambient)
 }
