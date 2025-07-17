@@ -28,6 +28,9 @@ mkdir -p "Plots/Quality_Control"
 mkdir -p "R_Data"
 mkdir -p "Logs"
 
+# Add a here file to the home directory
+touch .here
+
 # Create an r script that logs the home directory
 if [ ! -f "analysis_home_dir.R" ]; then
 echo 'scRNA_home_dir <- "'${scRNA_home_dir}'"' >> "analysis_home_dir.R"
@@ -134,6 +137,22 @@ scConfig.cluster_plot_ident <- "seurat_clusters"
 # exogenous_genes - Datatype: List of Strings
 # List of exogenous genes to be excluded from clustering
 scConfig.exogenous_genes <- c()
+
+EOF
+fi
+
+if [ ! -f ".gitignore" ]; then
+cat > .gitignore <<'EOF'
+# Ignore generated data and logs
+R_Data/
+Raw_Data/
+Logs/
+Plots/
+CSV_Results/
+snRNA_Log.txt
+
+# Ignore home folder declaration
+analysis_home_dir.R
 
 EOF
 fi
