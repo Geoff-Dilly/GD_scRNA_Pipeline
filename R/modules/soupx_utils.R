@@ -2,7 +2,7 @@
 
 #' @title Run SoupX Correction
 #' @description Run SoupX on an unfiltered Seurat object and add as assay
-run_soupx_correction <- function(sample, seurat_obj) {
+run_soupx_correction <- function(sample, seurat_obj, output_dir = "R_Data") {
   require(Seurat)
   require(SoupX)
 
@@ -27,7 +27,7 @@ run_soupx_correction <- function(sample, seurat_obj) {
   adj_matrix   <- adjustCounts(soup_channel, roundToInt = TRUE)
 
   # In your SoupX correction step (after autoEstCont and adjustCounts)
-  saveRDS(soup_channel, file = file.path("R_Data", paste0(sample$Sample_name, "_SoupChannel.rds")))
+  saveRDS(soup_channel, file = file.path(output_dir, paste0(sample$Sample_name, "_SoupChannel.rds")))
 
   # Remake a clean Seurat object and add SoupX results
   out_obj <- CreateSeuratObject(counts = filt_matrix)
