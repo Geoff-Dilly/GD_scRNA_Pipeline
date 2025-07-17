@@ -38,8 +38,6 @@ all_markers$PCT_Delta <- all_markers$pct.1 - all_markers$pct.2
 write.csv(all_markers, "CSV_Results/Marker_Genes_All/All_marker_genes.csv")
 
 # Make more manageable lists of the top markers and save as CSV
-all_markers <- read.csv("CSV_Results/Marker_Genes_All/All_marker_genes.csv")
-
 top30_cell_type_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 30, wt = avg_log2FC)
 write.csv(top30_cell_type_markers, "CSV_Results/Marker_Genes_All/Marker_Genes_Top30.csv")
 

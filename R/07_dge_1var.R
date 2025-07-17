@@ -202,9 +202,6 @@ summary_list <- foreach(cluster = clusters,
   summary
 }
 
-# Stop the parallel cluster
-stopCluster(cl)
-
 # Combine and write summary
 summary_df <- dplyr::bind_rows(summary_list)
 write.csv(summary_df, "CSV_Results/DEGs_All/DGE_summary.csv", row.names = FALSE)

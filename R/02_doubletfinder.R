@@ -28,6 +28,7 @@ scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 n_cores <- parallel::detectCores() - 1  # Or set n_cores manually if desired
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
+on.exit(stopCluster(cl))
 
 # Run DoubletFinder ####
 # Place each sample in a list for further processing
@@ -74,8 +75,6 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   saveRDS(sample_seurat, file = paste0("R_Data/", sample_name, "_seurat_Doublets.rds"))
   NULL
 }
-
-stopCluster(cl)
 
 # Log the completion time
 write(paste0("02_doubletfinder - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

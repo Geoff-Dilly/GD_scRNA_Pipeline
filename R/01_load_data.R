@@ -11,9 +11,6 @@ library(SoupX)
 scRNA_home_dir <- here()
 setwd(scRNA_home_dir)
 
-# For testing only!!!!
-scConfig.compute_soupx <- TRUE
-
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
@@ -77,8 +74,6 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
 
   return(top_ambient)
 }
-
-stopCluster(cl)
 
 if (scConfig.compute_soupx == TRUE) {
   # Combine and write SoupX summary
