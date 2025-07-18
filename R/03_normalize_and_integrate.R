@@ -10,17 +10,22 @@ setwd(scRNA_home_dir)
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
+source("R/modules/plot_utils.R")
+
+# Load the configuration file and metadata
+source("sc_experiment_config.R")
+scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Check for required directories
 check_required_dirs()
 
 ## Log the start time and a timestamped copy of the script
 write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/03_normalize_and_integrate.R")
+log_connection <- write_script_log("R/03_normalize_and_integrate.R")
 
 # Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
 on.exit({
   sink(NULL)
   sink(NULL, type = "message")
@@ -28,10 +33,6 @@ on.exit({
 
 # Set 'R_MAX_VSIZE' to maximum RAM usage
 Sys.setenv("R_MAX_VSIZE" = 32000000000)
-
-# Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
 # Get sample names in a list of strings
 str_sample_list <- scConfig.Sample_metadata$Sample_name
@@ -42,7 +43,7 @@ seurat_objects <- list()
 # Filter data ####
 # Read RDS files and assign them to variables dynamically
 for (sample in str_sample_list) {
-  sample_seurat <- readRDS(paste0("R_Data/", sample, "_seurat_Doublets.rds"))
+  sample_seurat <- readRDS(file.path("R_Data", paste0(sample, "_seurat_Doublets.rds")))
 
   if (scConfig.soupx_adjust == TRUE) {
     DefaultAssay(sample_seurat) <- "SoupX"
@@ -103,7 +104,7 @@ integrated_seurat <- IntegrateData(
   normalization.method = "SCT"
 )
 
-saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
+saveRDS(integrated_seurat, file.path("R_Data", paste0(scConfig.Prefix, "_SCT_integrated.rds")))
 
 # Examine QC metrics by animal ####
 Idents(integrated_seurat) <- integrated_seurat$Sample_name

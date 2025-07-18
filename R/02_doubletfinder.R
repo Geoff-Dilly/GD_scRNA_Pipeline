@@ -16,30 +16,30 @@ setwd(scRNA_home_dir)
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
-# Check for required directories
-check_required_dirs()
-
-# Log the start time and a timestamped copy of the script
-write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/02_doubletfinder.R")
-
-# Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
-on.exit({
-  sink(NULL)
-  sink(NULL, type = "message")
-})
-
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Check for required directories
+check_required_dirs()
+
 # Setup parallel backend
-n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores / 2)
-on.exit(stopCluster(cl))
+n_cores <- max(1, parallel::detectCores() - 1)
+cl <- makeCluster(n_cores)
 registerDoParallel(cl)
+
+# Log the start time and a timestamped copy of the script
+write(paste0("02_doubletfinder - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+log_connection <- write_script_log("R/02_doubletfinder.R")
+
+# Log all output to the end of the log file
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+  stopCluster(cl)
+})
 
 # Run DoubletFinder ####
 # Place each sample in a list for further processing
@@ -47,7 +47,7 @@ str_sample_list <- scConfig.Sample_metadata$Sample_name
 
 # Run DoubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
-  sample_seurat <- readRDS(paste0("R_Data/", sample_name, "_seurat.rds"))
+  sample_seurat <- readRDS(file.path("R_Data", paste0(sample_name, "_seurat.rds")))
 
   sample_seurat <- NormalizeData(sample_seurat)
   sample_seurat <- FindVariableFeatures(sample_seurat, selection.method = "vst", nfeatures = 2000)
@@ -61,7 +61,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 
   pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
-  homotypic_prop <- modelHomotypic(sample_seurat@meta.data$Sample_name)
+  homotypic_prop <- modelHomotypic(sample_seurat@meta.data$seurat_clusters)
   nExp_poi <- round((scConfig.expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
   nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
@@ -83,7 +83,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   sample_seurat[["RNA"]]$scale.data <- NULL
   sample_seurat[["RNA"]]$data <- NULL
 
-  saveRDS(sample_seurat, file = paste0("R_Data/", sample_name, "_seurat_Doublets.rds"))
+  saveRDS(sample_seurat, file = file.path("R_Data", paste0(sample_name, "_seurat_Doublets.rds")))
   NULL
 }
 

@@ -11,6 +11,10 @@ setwd(scRNA_home_dir)
 # Load custom functions
 source("R/modules/log_utils.R")
 
+# Load the configuration file and metadata
+source("sc_experiment_config.R")
+scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
 # Check for required directories
 check_required_dirs()
 
@@ -26,10 +30,7 @@ on.exit({
   sink(NULL, type = "message")
 })
 
-# Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
-
+# Load data ####
 # Load clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
@@ -85,7 +86,7 @@ combined_seurat$CellType <- Idents(combined_seurat)
 Idents(combined_seurat) <- combined_seurat$seurat_clusters
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+saveRDS(combined_seurat, file.path("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
 
 # Log the completion time
 write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

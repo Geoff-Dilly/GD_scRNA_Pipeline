@@ -18,38 +18,44 @@ setwd(scRNA_home_dir)
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
+# Load the configuration file and metadata
+source("sc_experiment_config.R")
+scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
 # Check for required directories
 check_required_dirs()
 
 # Log the start time and a time stamped copy of the script
 write(paste0("07_dge_1var - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/07_dge_1var.R")
+log_connection <- write_script_log("R/07_dge_1var.R")
+
+# Setup parallel backend
+n_cores <- max(1, parallel::detectCores() - 1)
+cl <- makeCluster(n_cores)
+registerDoParallel(cl)
 
 # Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
 on.exit({
   sink(NULL)
   sink(NULL, type = "message")
+  stopCluster(cl)
 })
-
-# Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
-
-# Define the cluster identity for plotting and DGE analysis
-cluster_col <- scConfig.cluster_plot_ident
-
-# Setup parallel backend
-n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores / 2)
-on.exit(stopCluster(cl))
-registerDoParallel(cl)
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 print(unique(combined_seurat$Sample_name))
+
+# Define the cluster identity for plotting and DGE analysis
+cluster_col <- scConfig.cluster_plot_ident
+
+# Ensure cluster_col exists in meta.data, default to seurat_clusters if not
+if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
+  message("cluster_col not found in metadata; defaulting to 'seurat_clusters'")
+  cluster_col <- "seurat_clusters"
+}
 
 # Select the assay for DESeq2 analysis
 if (scConfig.soupx_adjust == TRUE) {
@@ -64,14 +70,14 @@ if (scConfig.soupx_adjust == TRUE) {
 pseudobulked_seurat <- AggregateExpression(combined_seurat, assays = dge_assay, return.seurat = TRUE,
                                            group.by = c("Treatment", "Sample_name", cluster_col))
 
-pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat[[cluster_col]][,1], sep = "_")
+pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, pseudobulked_seurat[[cluster_col]][, 1], sep = "_")
 
 Idents(pseudobulked_seurat) <- "celltype.treatment"
 
 colnames_vec <- colnames(pseudobulked_seurat$RNA)
 
 # Get clusters and conditions
-clusters <- unique(pseudobulked_seurat[[cluster_col]][,1])
+clusters <- unique(pseudobulked_seurat[[cluster_col]][, 1])
 conditions <- unique(pseudobulked_seurat$Treatment)
 
 # DGE analysis and plotting ####
@@ -214,6 +220,6 @@ summary_list <- foreach(cluster = clusters,
 
 # Combine and write summary
 summary_df <- dplyr::bind_rows(summary_list)
-write.csv(summary_df, "CSV_Results/DEGs_All/DGE_summary.csv", row.names = FALSE)
+write.csv(summary_df, "CSV_Results/DGE_summary.csv", row.names = FALSE)
 
 write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

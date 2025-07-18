@@ -16,30 +16,38 @@ setwd(scRNA_home_dir)
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
 
+# Load the configuration file
+source("sc_experiment_config.R")
+scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
 # Check for required directories
 check_required_dirs()
 
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/06_make_plots.R")
+log_connection <- write_script_log("R/06_make_plots.R")
 
 # Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
 on.exit({
   sink(NULL)
   sink(NULL, type = "message")
 })
 
-# Load the configuration file
-source("sc_experiment_config.R")
-
+# Load data ####
 # Load the clustered Seurat object
-combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+combined_seurat <- readRDS(file.path("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
 DefaultAssay(combined_seurat) <- "SCT"
 
 # Set the identity to label clusters
-cluster_ident <- scConfig.cluster_plot_ident
+cluster_col <- scConfig.cluster_plot_ident
+
+# Ensure cluster_col exists in meta.data, default to seurat_clusters if not
+if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
+  message("cluster_col not found in metadata; defaulting to 'seurat_clusters'")
+  cluster_col <- "seurat_clusters"
+}
 
 # Overall QC: Ident = Project_name ####
 Idents(combined_seurat) <- combined_seurat$orig.ident
@@ -141,7 +149,7 @@ scatter_nc_vs_nf <- ggplot(
 save_plot_pdf(scatter_nc_vs_nf, "Plots/Quality_Control/Scatter_nCount_vs_nFeature_bySample.pdf", height = 5, width = 7)
 
 # Cluster-level QC: Ident = Seurat_clusters ####
-Idents(combined_seurat) <- cluster_ident
+Idents(combined_seurat) <- cluster_col
 
 # Clustered QC plots
 # Plot by cluster on the UMAP
@@ -157,7 +165,7 @@ save_plot_pdf(sample_umap_plot, "Plots/Clustering_Plots/Cluster_UMAP.pdf", heigh
 # Cell count barplot per sample (counts as height)
 cell_count_barplot <- ggplot(
   combined_seurat@meta.data,
-  aes(x = Sample_name, fill = .data[[cluster_ident]])
+  aes(x = Sample_name, fill = .data[[cluster_col]])
 ) +
   geom_bar() +
   theme_classic() +
@@ -171,7 +179,7 @@ save_plot_pdf(cell_count_barplot, "Plots/Quality_Control/Cell_Counts_Barplot.pdf
 # Plot samples as proportion or percentage of cluster
 sample_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
-  aes(x = .data[[cluster_ident]], fill = Sample_name)
+  aes(x = .data[[cluster_col]], fill = Sample_name)
 ) +
   geom_bar(position = "fill") +
   RotatedAxis() +
@@ -182,7 +190,7 @@ save_plot_pdf(sample_prop_bar_plot, "Plots/Quality_Control/Sample_prop_barPlot.p
 # Plot samples as proportion or percentage of cluster
 cluster_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
-  aes(x = Sample_name, fill = .data[[cluster_ident]])
+  aes(x = Sample_name, fill = .data[[cluster_col]])
 ) +
   geom_bar(position = "fill") +
   RotatedAxis() +
@@ -193,7 +201,7 @@ save_plot_pdf(cluster_prop_bar_plot, "Plots/Quality_Control/Cluster_prop_barPlot
 # Plot proportions of each condition in each cluster
 cond_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
-  aes(x = .data[[cluster_ident]], fill = Treatment)
+  aes(x = .data[[cluster_col]], fill = Treatment)
 ) +
   geom_bar(position = "fill") +
   geom_hline(yintercept = 0.5, linetype = "dashed", size = 1) +
@@ -205,7 +213,7 @@ save_plot_pdf(cond_prop_bar_plot, "Plots/Quality_Control/Cond_prop_barPlot.pdf",
 # Plot proportions of each sex in each cluster
 sex_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
-  aes(x = .data[[cluster_ident]], fill = Sex)
+  aes(x = .data[[cluster_col]], fill = Sex)
 ) +
   geom_bar(position = "fill") +
   geom_hline(yintercept = 0.5, linetype = "dashed", size = 1) +
@@ -228,12 +236,12 @@ save_plot_pdf(qc_by_cluster_vln_plot, "Plots/Quality_Control/QC_byCluster_VlnPlo
 all_markers <- read.csv("CSV_Results/Marker_Genes_All/All_marker_genes.csv")
 
 # Visualize the top marker gene expression in each cluster
-top_markers <- all_markers %>% group_by(cluster) %>% top_n(n = 1, wt = avg_log2FC)
+top_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC)
 top_marker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()
 save_plot_pdf(top_marker_dotplot, "Plots/Clustering_Plots/Top_Marker_DotPlot.pdf", height = 12, width = 18)
 
 # Visualize the top 2 marker genes expression in each cluster
-top_markers2 <- all_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+top_markers2 <- all_markers %>% group_by(cluster) %>% slice_max(n = 2, order_by = avg_log2FC)
 top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
 save_plot_pdf(top2markers_dotplot, "Plots/Clustering_Plots/Top2_Markers_DotPlot.pdf", height = 12, width = 18)
 

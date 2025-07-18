@@ -138,8 +138,14 @@ scConfig.cluster_plot_ident <- "seurat_clusters"
 # List of exogenous genes to be excluded from clustering
 scConfig.exogenous_genes <- c()
 
+# marker_gene_reference - Datatype: String
+# reference from marker_genes_db.csv to use for marker gene plots
+scConfig.marker_gene_reference <- "Dilly_et_al_2022"
+
 EOF
 fi
+
+sed 's|"path/to/home/dir"|"'"$scRNA_home_dir"'"|' sc_experiment_config.R > temp && mv temp sc_experiment_config.R
 
 if [ ! -f ".gitignore" ]; then
 cat > .gitignore <<'EOF'
@@ -156,7 +162,5 @@ analysis_home_dir.R
 
 EOF
 fi
-
-sed 's|"path/to/home/dir"|"'"$scRNA_home_dir"'"|' sc_experiment_config.R > temp && mv temp sc_experiment_config.R
 
 echo -e "\nSetup Complete"

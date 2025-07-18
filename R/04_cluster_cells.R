@@ -10,6 +10,10 @@ scRNA_home_dir <- here()
 setwd(scRNA_home_dir)
 
 # Setup ####
+# Load the configuration file and metadata
+source("sc_experiment_config.R")
+scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
 # Load custom functions
 source("R/modules/plot_utils.R")
 source("R/modules/log_utils.R")
@@ -19,22 +23,19 @@ check_required_dirs()
 
 # Log the start time and a timestamped copy of the script
 write(paste0("04_cluster_cells - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/04_cluster_cells.R")
+log_connection <- write_script_log("R/04_cluster_cells.R")
 
 # Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
 on.exit({
   sink(NULL)
   sink(NULL, type = "message")
 })
 
-# Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
-
+# Load data ####
 # Load normalized data
-combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
+combined_seurat <- readRDS(file.path("R_Data", paste0(scConfig.Prefix, "_SCT_integrated.rds")))
 
 # Get the number of cells per each sample
 cells_per_sample <- table(combined_seurat$Sample_name)
@@ -76,7 +77,7 @@ cells_per_cluster <- table(combined_seurat$seurat_clusters)
 write.csv(cells_per_cluster, "CSV_Results/Cells_per_cluster.csv")
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+saveRDS(combined_seurat, file.path("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
 
 # Examine the resulting UMAP
 clustered_umap_plot <- DimPlot(combined_seurat, label = TRUE)

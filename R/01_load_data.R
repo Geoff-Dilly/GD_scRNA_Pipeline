@@ -16,31 +16,30 @@ setwd(scRNA_home_dir)
 source("R/modules/log_utils.R")
 source("R/modules/soupx_utils.R")
 
-# Check for required directories
-check_required_dirs()
-
-# Log the start time and a timestamped copy of the script
-write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_file <- write_script_log("R/01_load_data.R")
-
-# Log all output to the end of the log file
-sink(log_file, append = TRUE)
-sink(log_file, type = "message", append = TRUE)
-on.exit({
-  sink(NULL)
-  sink(NULL, type = "message")
-})
-
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Check for required directories
+check_required_dirs()
+
 # Setup parallel backend
-n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores / 2)
-on.exit(stopCluster(cl))
+n_cores <- max(1, parallel::detectCores() - 1)
+cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
+# Log the start time and a timestamped copy of the script
+write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+log_connection <- write_script_log("R/01_load_data.R")
+
+# Log all output to the end of the log file
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+  stopCluster(cl)
+})
 
 # Check for required metadata columns
 mandatory_metadata_columns <- c("Sample_name", "Treatment", "Sex", "Raw_data_dir")
