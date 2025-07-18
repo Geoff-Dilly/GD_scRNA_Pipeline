@@ -10,16 +10,27 @@ setwd(scRNA_home_dir)
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
-write_script_log("R/05b_rename_clusters.R")
-
-# Log the start time and a timestamped copy of the script
-write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/05b_rename_clusters.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Check for required directories
+check_required_dirs()
+
+# Log the start time and a timestamped copy of the script
+write(paste0("05b_rename_clusters - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+log_file <- write_script_log("R/05b_rename_clusters.R")
+
+# Log all output to the end of the log file
+sink(log_file, append = TRUE)
+sink(log_file, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
+
+# Load data ####
 # Load clustered Seurat object
 combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
 
@@ -75,7 +86,7 @@ combined_seurat$CellType <- Idents(combined_seurat)
 Idents(combined_seurat) <- combined_seurat$seurat_clusters
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+saveRDS(combined_seurat, file.path("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
 
 # Log the completion time
 write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

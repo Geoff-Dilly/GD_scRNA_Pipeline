@@ -11,43 +11,42 @@ library(SoupX)
 scRNA_home_dir <- here()
 setwd(scRNA_home_dir)
 
-# For testing only!!!!
-scConfig.compute_soupx <- TRUE
-
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
 source("R/modules/soupx_utils.R")
 
-# Log the start time and a timestamped copy of the script
-write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/01_load_data.R")
-
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
 
+# Check for required directories
+check_required_dirs()
+
 # Setup parallel backend
-n_cores <- parallel::detectCores() - 1
-cl <- makeCluster(n_cores / 2)
+n_cores <- max(1, parallel::detectCores() - 1)
+cl <- makeCluster(n_cores)
 registerDoParallel(cl)
-on.exit(stopCluster(cl))
+
+# Log the start time and a timestamped copy of the script
+write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+log_connection <- write_script_log("R/01_load_data.R")
+
+# Log all output to the end of the log file
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+  stopCluster(cl)
+})
 
 # Check for required metadata columns
-if (!("Sample_name" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Sample_name> is not present")
-}
-
-if (!("Treatment" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Treatment> is not present")
-}
-
-if (!("Sex" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Sex> is not present")
-}
-
-if (!("Raw_data_dir" %in% colnames(scConfig.Sample_metadata))) {
-  stop("Mandatory metadata column <Raw_data_dir> is not present")
+mandatory_metadata_columns <- c("Sample_name", "Treatment", "Sex", "Raw_data_dir")
+for (col in mandatory_metadata_columns) {
+  if (!col %in% colnames(scConfig.Sample_metadata)) {
+    stop(paste("Missing mandatory metadata column:", col))
+  }
 }
 
 # Load data and run SoupX (optional) ####
@@ -73,12 +72,10 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
-  saveRDS(sample_seurat, file = paste0("R_Data/", sample$Sample_name, "_seurat.rds"))
+  saveRDS(sample_seurat, file = file.path("R_Data", paste0(sample$Sample_name, "_seurat.rds")))
 
   return(top_ambient)
 }
-
-stopCluster(cl)
 
 if (scConfig.compute_soupx == TRUE) {
   # Combine and write SoupX summary

@@ -10,17 +10,29 @@ setwd(scRNA_home_dir)
 # Setup ####
 # Load custom functions
 source("R/modules/log_utils.R")
-
-## Log the start time and a timestamped copy of the script
-write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-write_script_log("R/03_normalize_and_integrate.R")
-
-# Set 'R_MAX_VSIZE' to maximum RAM usage
-Sys.setenv("R_MAX_VSIZE" = 32000000000)
+source("R/modules/plot_utils.R")
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")
 scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+
+# Check for required directories
+check_required_dirs()
+
+## Log the start time and a timestamped copy of the script
+write(paste0("03_normalize_and_integrate - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+log_connection <- write_script_log("R/03_normalize_and_integrate.R")
+
+# Log all output to the end of the log file
+sink(log_connection, append = TRUE)
+sink(log_connection, type = "message", append = TRUE)
+on.exit({
+  sink(NULL)
+  sink(NULL, type = "message")
+})
+
+# Set 'R_MAX_VSIZE' to maximum RAM usage
+Sys.setenv("R_MAX_VSIZE" = 32000000000)
 
 # Get sample names in a list of strings
 str_sample_list <- scConfig.Sample_metadata$Sample_name
@@ -31,10 +43,10 @@ seurat_objects <- list()
 # Filter data ####
 # Read RDS files and assign them to variables dynamically
 for (sample in str_sample_list) {
-  sample_seurat <- readRDS(paste0("R_Data/", sample, "_seurat_Doublets.rds"))
+  sample_seurat <- readRDS(file.path("R_Data", paste0(sample, "_seurat_Doublets.rds")))
 
   if (scConfig.soupx_adjust == TRUE) {
-    default_assay(sample_seurat) <- "SoupX"
+    DefaultAssay(sample_seurat) <- "SoupX"
   }
 
   # Remove called doublets if specified
@@ -92,7 +104,19 @@ integrated_seurat <- IntegrateData(
   normalization.method = "SCT"
 )
 
-saveRDS(integrated_seurat, paste0("R_Data/", scConfig.Prefix, "_SCT_integrated.rds"))
+saveRDS(integrated_seurat, file.path("R_Data", paste0(scConfig.Prefix, "_SCT_integrated.rds")))
+
+# Examine QC metrics by animal ####
+Idents(integrated_seurat) <- integrated_seurat$Sample_name
+
+nFeature_vln_by_animal <- VlnPlot(integrated_seurat, features = "nFeature_RNA", pt.size = 0) # nolint
+save_plot_pdf(nFeature_vln_by_animal, "Plots/Quality_Control/nFeature_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
+
+nCount_vln_by_animal <- VlnPlot(integrated_seurat, features = "nCount_RNA", pt.size = 0) # nolint
+save_plot_pdf(nCount_vln_by_animal, "Plots/Quality_Control/nCount_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
+
+percent_mito_vln_by_animal <- VlnPlot(integrated_seurat, features = "percent_mito", pt.size = 0)
+save_plot_pdf(percent_mito_vln_by_animal, "Plots/Quality_Control/percentMito_ViolinPlot_byAnimal.pdf", height = 4, width = 6)
 
 # Log the completion time
 write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)

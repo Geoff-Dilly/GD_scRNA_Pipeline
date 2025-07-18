@@ -20,9 +20,13 @@ ENV_NAME="sc_analysis_env"
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
 # Create the conda environment from the YAML file
-conda env create -f sc_analysis_env.yaml
+conda env create -f sc_analysis_env.yaml --name $ENV_NAME
 conda activate $ENV_NAME
 
 # Install packages from GITHUB
 Rscript -e 'devtools::install_github("chris-mcginnis-ucsf/DoubletFinder")'
 Rscript -e 'devtools::install_github("immunogenomics/presto")'
+
+# Install glmGamPoi in R
+# glmGamPoi causes issues in MacOS otherwise
+Rscript -e 'BiocManager::install("glmGamPoi")'
