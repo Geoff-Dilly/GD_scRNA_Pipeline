@@ -18,7 +18,7 @@ Mbp,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Mobp,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Plp1,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Gad1,GABA_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Gad2,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
+Gad2,GABA_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Ndrg2,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Slc1a2,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
 Slc4a4,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022

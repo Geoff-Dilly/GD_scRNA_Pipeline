@@ -65,66 +65,59 @@ make_stacked_vln_plot <- function(
       axis.text.x = element_text(size = 8),
       strip.text.y = element_text(size = gene_label_size)
     )
-  
   return(p)
 }
 
-#' @title Plot aligned dotplots by cell type from marker gene CSV (grid output)
-#' @description Returns a single patchwork grid of all cell type dotplots, well aligned.
-plot_dotplots_by_celltype_grid <- function(
-    seurat_obj,
-    marker_csv = "reference/marker_genes_db.csv",
-    reference_name,
-    group_by = "seurat_clusters",
-    min_genes = 1,
-    ncol = 3, # Number of columns in grid (change as needed)
-    height = 6, width = 8 # Default plot size if saving
+dotplot_by_marker_group <- function(
+  seurat_obj,
+  marker_csv = "reference/marker_gene_db.csv",
+  reference_name = "Dilly_et_al_2022",
+  group_by = "seurat_clusters",
+  gene_group_col = "cell_type",   # or "cell_class", "function", etc.
+  add_separators = TRUE,
+  separator_color = "grey70",
+  separator_linetype = "dashed",
+  separator_size = 0.7
 ) {
-  require(ggplot2)
-  require(dplyr)
-  require(readr)
-  require(patchwork)
-  require(Seurat)
+  library(Seurat)
+  library(dplyr)
+  library(readr)
+  library(ggplot2)
 
-  # Read marker table
-  marker_tbl <- read_csv(marker_csv)
+  # 1. Read marker gene CSV
+  marker_tbl <- read_csv(marker_csv, show_col_types = FALSE) %>%
+    filter(reference == reference_name)
 
-  # Filter by reference
-  filtered_tbl <- marker_tbl %>% filter(reference == reference_name)
+  # 2. Prepare ordered gene list, grouped by category
+  marker_tbl <- marker_tbl %>%
+    mutate(!!gene_group_col := factor(.data[[gene_group_col]], levels = unique(.data[[gene_group_col]]))) %>%
+    arrange(.data[[gene_group_col]], gene)
+  gene_ordered <- marker_tbl$gene %>% unique()
 
-  # Get all genes and cell_types (in order)
-  all_genes <- unique(filtered_tbl$gene)
-  all_cell_types <- unique(filtered_tbl$cell_type)
+  # 3. Make DotPlot
+  p <- DotPlot(seurat_obj, features = gene_ordered, group.by = group_by) +
+    RotatedAxis() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+      axis.text.y = element_text(size = 9),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      plot.title = element_text(face = "bold", size = 14)
+    ) +
+    ggtitle(paste0("DotPlot: Marker Genes Grouped by ", gene_group_col))
 
-  plot_list <- list()
-  for (ct in all_cell_types) {
-    genes <- filtered_tbl %>% filter(cell_type == ct) %>% pull(gene)
-    genes <- genes[!is.na(genes)]
-    if (length(genes) >= min_genes) {
-      ordered_genes <- all_genes[all_genes %in% genes]
-      plot_genes <- all_genes
-
-      p <- DotPlot(seurat_obj, features = plot_genes, group.by = group_by) +
-        RotatedAxis() +
-        ggtitle(paste("Cell Type:", ct, "| Reference:", reference_name)) +
-        theme(
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-          axis.text.y = element_text(size = 8),
-          plot.title = element_text(face = "bold", size = 12)
-        ) +
-        scale_y_discrete(limits = rev(plot_genes)) +
-        geom_point(
-          data = function(data) {
-            data$highlight <- data$features.plot %in% ordered_genes
-            data
-          },
-          aes(alpha = highlight)
-        ) +
-        scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.2), guide = "none")
-      plot_list[[ct]] <- p
+  # 4. Add vertical separators between groups (optional)
+  if (add_separators) {
+    group_lengths <- table(marker_tbl[[gene_group_col]])
+    breaks <- cumsum(group_lengths)
+    # Remove last break to avoid line at the end
+    if (length(breaks) > 1) {
+      for (b in breaks[-length(breaks)]) {
+        p <- p + geom_vline(xintercept = b + 0.5, linetype = separator_linetype,
+                            color = separator_color, size = separator_size)
+      }
     }
   }
-  # Combine with patchwork
-  grid_plot <- wrap_plots(plot_list, ncol = ncol)
-  return(grid_plot)
+
+  return(p)
 }

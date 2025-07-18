@@ -296,5 +296,15 @@ for (marker in all_markers_list) {
   )
 }
 
+cell_types_dotgrid <- dotplot_by_marker_group(
+  seurat_obj = seurat_obj,
+  marker_csv = "reference/marker_gene_db.csv",
+  reference_name = "Dilly_et_al_2022",   
+  group_by = "seurat_clusters",     
+  gene_group_col = "cell_type",
+  add_separators = TRUE
+)
+save_plot_pdf(cell_types_dotgrid, "Plots/Clustering_Plots/Brainmarker_dotgrid_plot.pdf", height = 12, width = 10)
+
 # Log the completion time
 write(paste0("06_make_plots - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
