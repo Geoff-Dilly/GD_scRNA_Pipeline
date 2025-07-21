@@ -9,8 +9,8 @@ setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
-source("R/modules/log_utils.R")
-source("R/modules/plot_utils.R")
+source(here("R/modules/log_utils.R"))
+source(here("R/modules/soupx_utils.R"))
 
 # Load the configuration file and metadata
 source("sc_experiment_config.R")

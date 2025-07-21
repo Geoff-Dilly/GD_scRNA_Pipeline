@@ -8,17 +8,15 @@ library(dplyr)
 library(foreach)
 library(doParallel)
 library(SoupX)
-scRNA_home_dir <- here()
-setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
-source("R/modules/log_utils.R")
-source("R/modules/soupx_utils.R")
+source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/soupx_utils.R"))
 
 # Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+source(here::here("sc_experiment_config.R"))
+scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -29,8 +27,8 @@ cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
 # Log the start time and a timestamped copy of the script
-write(paste0("01_load_data - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_connection <- write_script_log("R/01_load_data.R")
+write(paste0("01_load_data - Start: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)
+log_connection <- write_script_log(here::here("R/01_load_data.R"))
 
 # Log all output to the end of the log file
 sink(log_connection, append = TRUE)
@@ -72,7 +70,10 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
-  saveRDS(sample_seurat, file = file.path("R_Data", paste0(sample$Sample_name, "_seurat.rds")))
+  saveRDS(
+    sample_seurat, 
+    file = here::here("R_Data", paste0(sample$Sample_name, "_seurat.rds"))
+  )
 
   return(top_ambient)
 }
@@ -80,8 +81,12 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
 if (scConfig.compute_soupx == TRUE) {
   # Combine and write SoupX summary
   summary_df <- bind_rows(top_ambient_genes)
-  write.csv(summary_df, "CSV_Results/Ambient_genes_summary.csv", row.names = FALSE)
+  write.csv(
+    summary_df,
+    here::here("CSV_Results", "Ambient_genes_summary.csv"),
+    row.names = FALSE
+  )
 }
 
 # Log the completion time
-write(paste0("01_load_data - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write(paste0("01_load_data - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)
