@@ -10,8 +10,10 @@ library(Seurat)
 source(here::here("R/modules/log_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+
 
 # Check for required directories
 check_required_dirs()
@@ -30,7 +32,7 @@ on.exit({
 
 # Load data ####
 # Load clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 
 # Rename Seurat clusters ####
 # Note: Manually edit this field to the correct length
@@ -84,7 +86,7 @@ combined_seurat$CellType <- Idents(combined_seurat)
 Idents(combined_seurat) <- combined_seurat$seurat_clusters
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 
 # Log the completion time
 write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)

@@ -13,8 +13,9 @@ source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -37,7 +38,7 @@ on.exit({
 
 # Load data ####
 # Load the previously clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 
 # Find marker genes and save results ####
 # Identify markers for each cluster

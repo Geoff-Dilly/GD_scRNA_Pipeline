@@ -13,9 +13,10 @@ library(ggplot2)
 source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
 
-# Load the configuration file
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+# Load the configuration file and metadata
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -34,11 +35,11 @@ on.exit({
 
 # Load data ####
 # Load the clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 DefaultAssay(combined_seurat) <- "SCT"
 
 # Set the identity to label clusters
-cluster_col <- scConfig.cluster_plot_ident
+cluster_col <- scConfig$cluster_plot_ident
 
 # Ensure cluster_col exists in meta.data, default to seurat_clusters if not
 if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
@@ -68,7 +69,7 @@ qc_umap_plot <- FeaturePlot(
 save_plot_pdf(qc_umap_plot, here::here("Plots/Quality_Control", "QC_UMAP.pdf"), height = 3, width = 18)
 
 # Examine doublet score in doublets and non doublets
-if (scConfig.remove_doublets == FALSE) {
+if (scConfig$remove_doublets == FALSE) {
   doublet_call_umap_plot <- FeaturePlot(
     combined_seurat,
     features = "Doublet_Score",
@@ -246,7 +247,7 @@ marker_stack_vln_plot <- make_stacked_vln_plot(
 save_plot_pdf(marker_stack_vln_plot, here::here("Plots/Clustering_Plots", "Top_Marker_stacked_vln_plot.pdf"), height = 12, width = 4)
 
 marker_tbl <- read.csv(here::here("reference", "marker_gene_db.csv"), stringsAsFactors = FALSE)
-major_marker_genes <- marker_tbl %>% filter(reference == scConfig.marker_gene_reference) %>% pull(gene)
+major_marker_genes <- marker_tbl %>% filter(reference == scConfig$marker_gene_reference) %>% pull(gene)
 
 major_marker_genes_unique <- unique(unlist(major_marker_genes))
 major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()

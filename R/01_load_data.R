@@ -15,8 +15,9 @@ source(here::here("R/modules/log_utils.R"))
 source(here::here("R/modules/soupx_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source("sc_experiment_config.R", envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -42,31 +43,31 @@ on.exit({
 # Check for required metadata columns
 mandatory_metadata_columns <- c("Sample_name", "Treatment", "Sex", "Raw_data_dir")
 for (col in mandatory_metadata_columns) {
-  if (!col %in% colnames(scConfig.Sample_metadata)) {
+  if (!col %in% colnames(scConfig$Sample_metadata)) {
     stop(paste("Missing mandatory metadata column:", col))
   }
 }
 
 # Load data and run SoupX (optional) ####
-sample_list <- split(scConfig.Sample_metadata, seq_len(nrow(scConfig.Sample_metadata)))
+sample_list <- split(scConfig$Sample_metadata, seq_len(nrow(scConfig$Sample_metadata)))
 
 top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "SoupX", "dplyr")) %dopar% {
   top_ambient <- NULL
   filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
-  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig.Project_name, min.cells = 1, min.features = 1)
+  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$Project_name, min.cells = 1, min.features = 1)
 
-  if (scConfig.compute_soupx == TRUE) {
+  if (scConfig$compute_soupx == TRUE) {
     soupx_results <- run_soupx_correction(sample, sample_seurat)
     sample_seurat <- soupx_results$seurat_obj
     top_ambient <- soupx_results$top_ambient
   }
 
   # Filter the Seurat object for QC and add metadata
-  sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.mito_pattern, col.name = "percent_mito")
-  sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig.ribo_pattern, col.name = "percent_ribo")
-  sample_seurat <- subset(sample_seurat, subset = nFeature_RNA > scConfig.nFeature_RNA_cutoff &
-                            percent_mito < scConfig.percent_mito_cutoff &
-                            percent_ribo < scConfig.percent_ribo_cutoff)
+  sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig$mito_pattern, col.name = "percent_mito")
+  sample_seurat <- PercentageFeatureSet(sample_seurat, pattern = scConfig$ribo_pattern, col.name = "percent_ribo")
+  sample_seurat <- subset(sample_seurat, subset = nFeature_RNA > scConfig$nFeature_RNA_cutoff &
+                            percent_mito < scConfig$percent_mito_cutoff &
+                            percent_ribo < scConfig$percent_ribo_cutoff)
   for (col in setdiff(colnames(sample), "Raw_data_dir")) {
     sample_seurat[[col]] <- sample[[col]]
   }
@@ -78,7 +79,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   return(top_ambient)
 }
 
-if (scConfig.compute_soupx == TRUE) {
+if (scConfig$compute_soupx == TRUE) {
   # Combine and write SoupX summary
   summary_df <- bind_rows(top_ambient_genes)
   write.csv(

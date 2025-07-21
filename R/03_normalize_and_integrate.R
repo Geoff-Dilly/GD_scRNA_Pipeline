@@ -11,8 +11,9 @@ source(here::here("R/modules/log_utils.R"))
 source(here::here("R/modules/soupx_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -33,7 +34,7 @@ on.exit({
 Sys.setenv("R_MAX_VSIZE" = 32000000000)
 
 # Get sample names in a list of strings
-str_sample_list <- scConfig.Sample_metadata$Sample_name
+str_sample_list <- scConfig$Sample_metadata$Sample_name
 
 # Initialize a list to store the Seurat objects
 seurat_objects <- list()
@@ -42,18 +43,18 @@ seurat_objects <- list()
 for (sample in str_sample_list) {
   sample_seurat <- readRDS(here::here("R_Data", paste0(sample, "_seurat_Doublets.rds")))
 
-  if (scConfig.soupx_adjust == TRUE) {
+  if (scConfig$soupx_adjust == TRUE) {
     DefaultAssay(sample_seurat) <- "SoupX"
   }
 
   # Remove called doublets if specified
-  if (scConfig.remove_doublets == TRUE) {
+  if (scConfig$remove_doublets == TRUE) {
     sample_seurat <- subset(sample_seurat, subset = Doublet_Call == "Singlet")
   }
 
   # Remove mitochondrial genes if specified
-  if (scConfig.remove_mito_genes == TRUE) {
-    mito_genes <- grep(scConfig.mito_pattern, rownames(sample_seurat), value = TRUE)
+  if (scConfig$remove_mito_genes == TRUE) {
+    mito_genes <- grep(scConfig$mito_pattern, rownames(sample_seurat), value = TRUE)
     sample_seurat <- subset(
       sample_seurat,
       features = setdiff(rownames(sample_seurat), mito_genes)
@@ -61,8 +62,8 @@ for (sample in str_sample_list) {
   }
 
   # Remove ribosomal genes if specified
-  if (scConfig.remove_ribo_genes == TRUE) {
-    ribo_genes <- grep(scConfig.ribo_pattern, rownames(sample_seurat), value = TRUE)
+  if (scConfig$remove_ribo_genes == TRUE) {
+    ribo_genes <- grep(scConfig$ribo_pattern, rownames(sample_seurat), value = TRUE)
     sample_seurat <- subset(
       sample_seurat,
       features = setdiff(rownames(sample_seurat), ribo_genes)
@@ -70,7 +71,7 @@ for (sample in str_sample_list) {
   }
 
   # Remove the top quartile high UMI cells if specified
-  if (scConfig.remove_top_nUMIs == TRUE) {
+  if (scConfig$remove_top_nUMIs == TRUE) {
     umi_threshold <- quantile(sample_seurat$nCount_RNA, 0.75)
     sample_seurat <- subset(sample_seurat, subset = nCount_RNA < umi_threshold)
   }
@@ -101,7 +102,7 @@ integrated_seurat <- IntegrateData(
   normalization.method = "SCT"
 )
 
-saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig.Prefix, "_SCT_integrated.rds")))
+saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig$Prefix, "_SCT_integrated.rds")))
 
 # Examine QC metrics by animal ####
 Idents(integrated_seurat) <- integrated_seurat$Sample_name

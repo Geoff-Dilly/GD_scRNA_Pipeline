@@ -10,11 +10,12 @@ library(ggplot2)
 # Setup ####
 # Load the configuration file and metadata
 source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
-# Load custom functions
-source(here::here("R/modules/plot_utils.R"))
-source(here::here("R/modules/log_utils.R"))
+# Load the configuration file and metadata
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -33,7 +34,7 @@ on.exit({
 
 # Load data ####
 # Load normalized data
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig.Prefix, "_SCT_integrated.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_SCT_integrated.rds")))
 
 # Get the number of cells per each sample
 cells_per_sample <- table(combined_seurat$Sample_name)
@@ -44,7 +45,7 @@ qc_violins_plot <- VlnPlot(combined_seurat, features = c("nFeature_RNA", "nCount
 save_plot_pdf(qc_violins_plot, here::here("Plots/Quality_Control", "QC_Violins.pdf"), height = 4, width = 12)
 
 # Remove exogenous genes from variable features
-VariableFeatures(combined_seurat) <- setdiff(VariableFeatures(combined_seurat), scConfig.exogenous_genes)
+VariableFeatures(combined_seurat) <- setdiff(VariableFeatures(combined_seurat), scConfig$exogenous_genes)
 
 # Scale data and run UMAP ####
 # Perform PCA
@@ -68,14 +69,14 @@ save_plot_pdf(qc_umap_plot, here::here("Plots/Quality_Control", "QC_UMAP.pdf"), 
 # Perform clustering ####
 # Identifies clusters of cells within the UMAP
 combined_seurat <- FindNeighbors(combined_seurat, reduction = "pca", dims = 1:25)
-combined_seurat <- FindClusters(combined_seurat, resolution = scConfig.clustering_resolution)
+combined_seurat <- FindClusters(combined_seurat, resolution = scConfig$clustering_resolution)
 
 # Get the number of cells per each cluster
 cells_per_cluster <- table(combined_seurat$seurat_clusters)
 write.csv(cells_per_cluster, here::here("CSV_Results", "Cells_per_cluster.csv"))
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 
 # Examine the resulting UMAP
 clustered_umap_plot <- DimPlot(combined_seurat, label = TRUE)
@@ -97,7 +98,7 @@ save_plot_pdf(doublet_score_vln_plot, here::here("Plots/Quality_Control", "Doubl
 # Visualize marker gene expression ####
 # Using markers from Dilly et al. 2022
 marker_tbl <- read.csv(here::here("reference", "marker_gene_db.csv"), stringsAsFactors = FALSE)
-marker_genes <- marker_tbl %>% filter(reference == scConfig.marker_gene_reference) %>% pull(gene)
+marker_genes <- marker_tbl %>% filter(reference == scConfig$marker_gene_reference) %>% pull(gene)
 
 major_cells_dotplot <- DotPlot(combined_seurat, features = marker_genes) + RotatedAxis()
 save_plot_pdf(major_cells_dotplot, here::here("Plots/Clustering_Plots", "Major_Cell_Types_DotPlot.pdf"), height = 6, width = 8)

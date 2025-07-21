@@ -15,8 +15,9 @@ source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -41,7 +42,7 @@ on.exit({
 
 # Run DoubletFinder ####
 # Place each sample in a list for further processing
-str_sample_list <- scConfig.Sample_metadata$Sample_name
+str_sample_list <- scConfig$Sample_metadata$Sample_name
 
 # Run DoubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
@@ -60,7 +61,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
   homotypic_prop <- modelHomotypic(sample_seurat@meta.data$seurat_clusters)
-  nExp_poi <- round((scConfig.expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
+  nExp_poi <- round((scConfig$expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
   nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
   sample_seurat <- doubletFinder(sample_seurat,
@@ -78,6 +79,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   sample_seurat[[call]] <- NULL
   sample_seurat[[score]] <- NULL
 
+  # Remove large unnecessary assays
   sample_seurat[["RNA"]]$scale.data <- NULL
   sample_seurat[["RNA"]]$data <- NULL
 

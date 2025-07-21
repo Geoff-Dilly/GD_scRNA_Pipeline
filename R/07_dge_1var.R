@@ -17,8 +17,9 @@ source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
 
 # Load the configuration file and metadata
-source(here::here("sc_experiment_config.R"))
-scConfig.Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+scConfig <- new.env()
+sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
@@ -43,11 +44,11 @@ on.exit({
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig.Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
 print(unique(combined_seurat$Sample_name))
 
 # Define the cluster identity for plotting and DGE analysis
-cluster_col <- scConfig.cluster_plot_ident
+cluster_col <- scConfig$cluster_plot_ident
 
 # Ensure cluster_col exists in meta.data, default to seurat_clusters if not
 if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
@@ -56,7 +57,7 @@ if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
 }
 
 # Select the assay for DESeq2 analysis
-if (scConfig.soupx_adjust == TRUE) {
+if (scConfig$soupx_adjust == TRUE) {
   # If SoupX was used, set the default assay to SoupX
   dge_assay <- "SoupX"
 } else {
