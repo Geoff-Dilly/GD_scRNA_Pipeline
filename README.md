@@ -35,7 +35,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
     conda activate sc_analysis_env
     ```
 4. **Set up metadata and configuration:**
-   - Edit `sc_experiment_config.yaml` and `sc_sample_metadata.csv` as needed
+- Edit `sc_experiment_config.yaml` and `sc_sample_metadata.csv` as needed
 5. **Run the analysis pipeline:**
     ```sh
     bash run_pipeline.sh
