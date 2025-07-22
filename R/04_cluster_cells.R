@@ -3,6 +3,7 @@
 # Author: Geoff Dilly
 
 library(here)
+library(yaml)
 library(dplyr)
 library(Seurat)
 library(ggplot2)
@@ -13,8 +14,7 @@ source(here::here("sc_experiment_config.R"))
 scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Load the configuration file and metadata
-scConfig <- new.env()
-sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
 scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories

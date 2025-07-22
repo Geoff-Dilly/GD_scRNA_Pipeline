@@ -3,6 +3,7 @@
 # Author: Geoff Dilly
 
 library(here)
+library(yaml)
 library(foreach)
 library(doParallel)
 library(Seurat)
@@ -15,10 +16,10 @@ library(pheatmap)
 # Load custom functions
 source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/qc_utils.R"))
 
 # Load the configuration file and metadata
-scConfig <- new.env()
-sys.source(here::here("sc_experiment_config.R"), envir = scConfig)
+scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
 scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
