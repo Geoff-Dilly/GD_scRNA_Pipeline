@@ -16,7 +16,6 @@ source(here::here("R/modules/plot_utils"))
 scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
 scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
-
 # Check for required directories
 check_required_dirs()
 
