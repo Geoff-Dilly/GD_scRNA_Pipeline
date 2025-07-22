@@ -21,12 +21,13 @@ raw_data_folder: Raw_Data
 
 # mito_pattern - Datatype: String
 # Str pattern that identifies mitochondrial genes
-# Mouse = "^mt-"; Rat = "^Mt-"; Human = "^MT-"
-mito_pattern: "^mt-"
+# Mouse = '^mt-'; Rat = '^Mt-'; Human = '^MT-'
+mito_pattern: '^mt-'
 
 # ribo_pattern - Datatype: String
 # Str pattern that identifies ribosomal genes
-ribo_pattern: "^Rp[ls]"
+# For rat/mouse use '^Rp[ls][[:digit:]]|^Rn[[:digit:]]'
+ribo_pattern: '^Rp[ls][[:digit:]]|^Rn[[:digit:]]'
 
 # nFeature_RNA_cutoff - Datatype: Int 
 # Minimum number of nCount detected to include cell
