@@ -57,7 +57,7 @@ if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
 }
 
 # Select the assay for DESeq2 analysis
-if (scConfig$soupx_adjust == TRUE) {
+if (scConfig$soupx_adjust) {
   # If SoupX was used, set the default assay to SoupX
   dge_assay <- "SoupX"
 } else {

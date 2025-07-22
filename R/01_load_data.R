@@ -56,7 +56,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
   sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$Project_name, min.cells = 1, min.features = 1)
 
-  if (scConfig$compute_soupx == TRUE) {
+  if (scConfig$compute_soupx) {
     soupx_results <- run_soupx_correction(sample, sample_seurat)
     sample_seurat <- soupx_results$seurat_obj
     top_ambient <- soupx_results$top_ambient
@@ -79,7 +79,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   return(top_ambient)
 }
 
-if (scConfig$compute_soupx == TRUE) {
+if (scConfig$compute_soupx) {
   # Combine and write SoupX summary
   summary_df <- bind_rows(top_ambient_genes)
   write.csv(

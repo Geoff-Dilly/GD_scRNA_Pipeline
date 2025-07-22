@@ -43,17 +43,17 @@ seurat_objects <- list()
 for (sample in str_sample_list) {
   sample_seurat <- readRDS(here::here("R_Data", paste0(sample, "_seurat_Doublets.rds")))
 
-  if (scConfig$soupx_adjust == TRUE) {
+  if (scConfig$soupx_adjust ) {
     DefaultAssay(sample_seurat) <- "SoupX"
   }
 
   # Remove called doublets if specified
-  if (scConfig$remove_doublets == TRUE) {
+  if (scConfig$remove_doublets) {
     sample_seurat <- subset(sample_seurat, subset = Doublet_Call == "Singlet")
   }
 
   # Remove mitochondrial genes if specified
-  if (scConfig$remove_mito_genes == TRUE) {
+  if (scConfig$remove_mito_genes) {
     mito_genes <- grep(scConfig$mito_pattern, rownames(sample_seurat), value = TRUE)
     sample_seurat <- subset(
       sample_seurat,
@@ -62,7 +62,7 @@ for (sample in str_sample_list) {
   }
 
   # Remove ribosomal genes if specified
-  if (scConfig$remove_ribo_genes == TRUE) {
+  if (scConfig$remove_ribo_genes) {
     ribo_genes <- grep(scConfig$ribo_pattern, rownames(sample_seurat), value = TRUE)
     sample_seurat <- subset(
       sample_seurat,
@@ -71,7 +71,7 @@ for (sample in str_sample_list) {
   }
 
   # Remove the top quartile high UMI cells if specified
-  if (scConfig$remove_top_nUMIs == TRUE) {
+  if (scConfig$remove_top_nUMIs) {
     umi_threshold <- quantile(sample_seurat$nCount_RNA, 0.75)
     sample_seurat <- subset(sample_seurat, subset = nCount_RNA < umi_threshold)
   }
