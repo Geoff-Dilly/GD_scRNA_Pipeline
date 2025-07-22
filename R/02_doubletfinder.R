@@ -53,7 +53,6 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   sample_seurat <- FindVariableFeatures(sample_seurat, selection.method = "vst", nfeatures = 2000)
   sample_seurat <- ScaleData(sample_seurat)
   sample_seurat <- RunPCA(sample_seurat)
-  sample_seurat <- RunUMAP(sample_seurat, dims = 1:10)
 
   sweep_res_list <- paramSweep(sample_seurat, PCs = 1:10, sct = FALSE)
   sweep_stats <- summarizeSweep(sweep_res_list, GT = FALSE)
