@@ -3,16 +3,16 @@
 
 # Project_name - Datatype: String
 # Name of the project for Seurat
-scConfig$Project_name <- "GD_scRNA_Experiment"
+scConfig$project_name <- "GD_scRNA_Experiment"
 
 # Project_name - Datatype: String
 # Prefix for filenames of R objects
-scConfig$Prefix <- "GD_scRNA"
+scConfig$prefix <- "GD_scRNA"
 
 # Home_folder - Datatype: String (Path)
 # Home directory where all analysis directories will be located
 # This is generally not needed but good to note
-scConfig$Home_folder <-   "__HOME_DIR__"
+scConfig$home_folder <-   "__HOME_DIR__"
 
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data

@@ -38,7 +38,7 @@ on.exit({
 
 # Load data ####
 # Load the previously clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 
 # Find marker genes and save results ####
 # Identify markers for each cluster

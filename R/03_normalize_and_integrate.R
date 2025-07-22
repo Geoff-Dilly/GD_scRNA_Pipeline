@@ -102,7 +102,7 @@ integrated_seurat <- IntegrateData(
   normalization.method = "SCT"
 )
 
-saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig$Prefix, "_SCT_integrated.rds")))
+saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
 
 # Examine QC metrics by animal ####
 Idents(integrated_seurat) <- integrated_seurat$Sample_name

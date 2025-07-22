@@ -34,7 +34,7 @@ on.exit({
 
 # Load data ####
 # Load normalized data
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_SCT_integrated.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
 
 # Get the number of cells per each sample
 cells_per_sample <- table(combined_seurat$Sample_name)
@@ -76,7 +76,7 @@ cells_per_cluster <- table(combined_seurat$seurat_clusters)
 write.csv(cells_per_cluster, here::here("CSV_Results", "Cells_per_cluster.csv"))
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
+saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 
 # Examine the resulting UMAP
 clustered_umap_plot <- DimPlot(combined_seurat, label = TRUE)

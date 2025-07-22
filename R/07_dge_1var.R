@@ -44,7 +44,7 @@ on.exit({
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 print(unique(combined_seurat$Sample_name))
 
 # Define the cluster identity for plotting and DGE analysis

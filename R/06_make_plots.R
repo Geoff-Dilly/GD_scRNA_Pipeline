@@ -35,7 +35,7 @@ on.exit({
 
 # Load data ####
 # Load the clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$Prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 DefaultAssay(combined_seurat) <- "SCT"
 
 # Set the identity to label clusters
@@ -47,7 +47,7 @@ if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
   cluster_col <- "seurat_clusters"
 }
 
-# Overall QC: Ident = Project_name ####
+# Overall QC: Ident = project_name ####
 Idents(combined_seurat) <- combined_seurat$orig.ident
 
 # Quality metric violin plots
