@@ -3,7 +3,7 @@
 #' @title Write Script Log
 #' @description This function writes a log of the script execution,
 #' @description including the script content, configuration file, and session info.
-write_script_log <- function(script_file, config_file = "sc_experiment_config.R", log_dir = "Logs/") {
+write_script_log <- function(script_file, config_file = "sc_experiment_config.yaml", log_dir = "Logs/") {
   timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
 
   # Open a log file in the Logs directory
