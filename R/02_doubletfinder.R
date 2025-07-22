@@ -69,7 +69,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
                                  PCs = 1:10,
                                  pN = 0.25,
                                  pK = pK_value,
-                                 nExp = nExp_poi,
+                                 nExp = nExp_poi.adj,
                                  sct = FALSE)
 
   meta_cols <- colnames(sample_seurat@meta.data)
