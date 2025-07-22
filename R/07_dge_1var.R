@@ -74,7 +74,7 @@ pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, p
 
 Idents(pseudobulked_seurat) <- "celltype.treatment"
 
-colnames_vec <- colnames(pseudobulked_seurat$RNA)
+colnames_vec <- colnames(pseudobulked_seurat$dge_assay)
 
 # Get clusters and conditions
 clusters <- unique(pseudobulked_seurat[[cluster_col]][, 1])
