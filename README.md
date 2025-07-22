@@ -14,7 +14,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - `sc_analysis_env.yaml`: YAML containing Anaconda dependencies.
 - `R/`: R scripts for data processing, clustering, cell identification, visualization, and DGE.
 - `run_pipeline.sh`: Editable Bash script to run the R scripts in order.
-- `sc_experiment_config.R`: R configuration file to set pipeline parameters.
+- `sc_experiment_config.yaml`: YAML configuration file to set pipeline parameters.
 - `sc_sample_metadata.csv`: Metadata CSV file for identifying and labeling samples.
 - `reference/marker_gene_db.csv`: A CSV database of sets of marker genes for cluster analysis.
 
