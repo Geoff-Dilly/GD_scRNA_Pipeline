@@ -8,7 +8,7 @@ write_script_log <- function(script_file, config_file = "sc_experiment_config.ya
 
   # Open a log file in the Logs directory
   log_file <- file.path(log_dir, paste0("Time_", timestamp, "_Script_Log_",
-                     tools::file_path_sans_ext(basename(script_file)), ".txt"))
+                                        tools::file_path_sans_ext(basename(script_file)), ".txt"))
 
   log_connection <- file(log_file, open = "wt")
 

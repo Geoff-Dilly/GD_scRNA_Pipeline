@@ -63,7 +63,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 
   homotypic_prop <- modelHomotypic(sample_seurat@meta.data$seurat_clusters)
   nExp_poi <- round((scConfig$expct_doublet_pct/100) * nrow(sample_seurat@meta.data))
-  nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
+  nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop)) # nolint
 
   sample_seurat <- doubletFinder(sample_seurat,
                                  PCs = 1:10,

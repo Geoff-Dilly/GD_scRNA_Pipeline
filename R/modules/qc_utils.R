@@ -21,8 +21,8 @@ qc_filter_seurat <- function(seurat_obj, config = scConfig) {
   seurat_obj <- subset(
     seurat_obj,
     subset = nFeature_RNA > config$nFeature_RNA_cutoff &
-             percent_mito < config$percent_mito_cutoff &
-             percent_ribo < config$percent_ribo_cutoff
+      percent_mito < config$percent_mito_cutoff &
+      percent_ribo < config$percent_ribo_cutoff
   )
 
   # Remove the top quartile high UMI cells if specified
@@ -57,6 +57,8 @@ qc_filter_seurat <- function(seurat_obj, config = scConfig) {
   return(seurat_obj)
 }
 
+#' @title Strip Seurat Object
+#' @description Removes unused data from a Seurat object
 strip_seurat_obj <- function(seurat_obj) {
   # Strip reductions and related data
   seurat_obj@reductions <- list()
@@ -115,32 +117,36 @@ run_soupx_correction <- function(sample, seurat_obj, output_dir = "R_Data") {
   # Return as a list for easy unpacking
   return(list(seurat_obj = out_obj, top_ambient = top_ambient))
 }
-
+#' @title Run DoubletFinder
+#' @description Run DoubletFinder to detect doublets in a Seurat object
 run_doubletfinder <- function(sample, seurat_obj, config = scConfig) {
-  require(seurat)
-  require(doubletFinder)
+  # Check if DoubletFinder is installedd
+  if (!requireNamespace("DoubletFinder", quietly = TRUE)) stop("DoubletFinder package is required.")
 
-  seurat_obj <- SCTransform(seurat_obj, verbose = FALSE)
-  seurat_obj <- RunPCA(seurat_obj)
-  seurat_obj <- RunUMAP(seurat_obj, dims = 1:10)
+  # Normalize and run UMAP
+  seurat_obj <- Seurat::SCTransform(seurat_obj, verbose = FALSE)
+  seurat_obj <- Seurat::RunPCA(seurat_obj)
+  seurat_obj <- Seurat::RunUMAP(seurat_obj, dims = 1:10)
 
-  sweep_res_list <- paramSweep(seurat_obj, PCs = 1:10, sct = FALSE)
-  sweep_stats <- summarizeSweep(sweep_res_list, GT = FALSE)
-  bcmvn <- find.pK(sweep_stats)
-
+  # Sweep to find the optimal pK value for DoubletFinder
+  sweep_res_list <- DoubletFinder::paramSweep(seurat_obj, PCs = 1:10, sct = FALSE)
+  sweep_stats <- DoubletFinder::summarizeSweep(sweep_res_list, GT = FALSE)
+  bcmvn <- DoubletFinder::find.pK(sweep_stats)
   pK_value <- as.numeric(as.vector(bcmvn$pK[which.max(bcmvn$BCmetric), drop = TRUE]))
 
-  homotypic_prop <- modelHomotypic(seurat_obj@meta.data$seurat_clusters)
+  homotypic_prop <- DoubletFinder::modelHomotypic(seurat_obj@meta.data$seurat_clusters)
   nExp_poi <- round((config$expct_doublet_pct/100) * nrow(seurat_obj@meta.data))
   nExp_poi.adj <- round(nExp_poi * (1 - homotypic_prop))
 
-  seurat_obj <- doubletFinder(seurat_obj,
-                              PCs = 1:10,
-                              pN = 0.25,
-                              pK = pK_value,
-                              nExp = nExp_poi,
-                              sct = TRUE)
+  # Run DoubletFinder
+  seurat_obj <- DoubletFinder::doubletFinder(seurat_obj,
+                                             PCs = 1:10,
+                                             pN = 0.25,
+                                             pK = pK_value,
+                                             nExp = nExp_poi.adj,
+                                             sct = TRUE)
 
+  # Standardize and save DoubletFinder results
   meta_cols <- colnames(seurat_obj@meta.data)
   score <- stringr::str_subset(meta_cols, "^pANN")
   call <- stringr::str_subset(meta_cols, "^DF.cl")
@@ -148,15 +154,7 @@ run_doubletfinder <- function(sample, seurat_obj, config = scConfig) {
   seurat_obj$Doublet_Call <- seurat_obj[[call]]
 
   # Strip unnecessary data from the seurat object
-  seurat_obj@reductions <- list()
-  seurat_obj[["RNA"]]$scale.data <- NULL
-  seurat_obj[["RNA"]]$data <- NULL
-  seurat_obj[["SCT"]] <- NULL
-  VariableFeatures(seurat_obj) <- character(0)
-  seurat_obj@graphs <- list()
-  seurat_obj@neighbors <- list()
-  seurat_obj@commands <- list()
-  seurat_obj@misc <- list()
+  seurat_obj <- strip_seurat_obj(seurat_obj)
 
   saveRDS(
     seurat_obj,

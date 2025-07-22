@@ -286,8 +286,8 @@ for (marker in all_markers_list) {
 cell_types_dotgrid <- dotplot_by_marker_group(
   seurat_obj = combined_seurat,
   marker_csv = here::here("reference", "marker_gene_db.csv"),
-  reference_name = "Dilly_et_al_2022",   
-  group_by = "seurat_clusters",     
+  reference_name = "Dilly_et_al_2022",
+  group_by = "seurat_clusters",
   gene_group_col = "cell_type",
   add_separators = TRUE
 )
