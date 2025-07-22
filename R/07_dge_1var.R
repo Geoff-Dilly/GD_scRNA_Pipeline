@@ -14,9 +14,9 @@ library(pheatmap)
 
 # Setup ####
 # Load custom functions
-source(here::here("R/modules/plot_utils.R"))
 source(here::here("R/modules/log_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
+source(here::here("R/modules/plot_utils"))
 
 # Load the configuration file and metadata
 scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
