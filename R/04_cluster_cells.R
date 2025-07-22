@@ -14,6 +14,10 @@ source(here::here("R/modules/log_utils.R"))
 source(here::here("R/modules/soupx_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
 
+# Load the configuration file and metadata
+scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
+
 # Check for required directories
 check_required_dirs()
 
