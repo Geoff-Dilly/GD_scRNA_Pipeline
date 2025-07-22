@@ -1,44 +1,29 @@
 gene,cell_type,cell_class,brain_region,tissue,species,reference
-IL7R,Naive CD4+ T,NA,NA,PBMCs,Human,Seurat_vignette
-CCR7,Naive CD4+ T,NA,NA,PBMCs,Human,Seurat_vignette
-CD14,CD14+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
-LYZ,CD14+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
-IL7R,Memory CD4+,NA,NA,PBMCs,Human,Seurat_vignette
-S100A4,Memory CD4+,NA,NA,PBMCs,Human,Seurat_vignette
-MS4A1,B,NA,NA,PBMCs,Human,Seurat_vignette
-CD8A,CD8+ T,NA,NA,PBMCs,Human,Seurat_vignette
-FCGR3A,FCGR3A+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
-MS4A7,FCGR3A+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
-GNLY,NK,NA,NA,PBMCs,Human,Seurat_vignette
-NKG7,NK,NA,NA,PBMCs,Human,Seurat_vignette
-FCER1A,DC,NA,NA,PBMCs,Human,Seurat_vignette
-CST3,DC,NA,NA,PBMCs,Human,Seurat_vignette
-PPBP,Platelet,NA,NA,PBMCs,Human,Seurat_vignette
-Mbp,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Mobp,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Plp1,Oligodendrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Gad1,GABA_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Gad2,GABA_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Ndrg2,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Slc1a2,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Slc4a4,Astrocytes,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Slc17a7,Excitatory_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Satb1,Excitatory_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Neurod6,Excitatory_Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Vcan,OPCs,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Pdgfra,OPCs,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Pcdh15,OPCs,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Csf1r,Microglia,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Apbb1ip,Microglia,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-P2ry12,Microglia,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Flt1,Endothelial_Cells,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-B2m,Endothelial_Cells,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Bmp4,Immature_Oligos,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Cnp,Immature_Oligos,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Ccdc153,Ependymal_Cells,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Rsph1,Ependymal_Cells,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Tmem212,Ependymal_Cells,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
-Rbfox3,Neurons,Major_Cells,CeA,Brain,Rat,Dilly_et_al_2022
+Mbp,Oligodendrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Mobp,Oligodendrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Plp1,Oligodendrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Gad1,GABA_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Gad2,Oligodendrocytes,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Ndrg2,Astrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Slc1a2,Astrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Slc4a4,Astrocytes,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Slc17a7,Excitatory_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Satb1,Excitatory_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Neurod6,Excitatory_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Vcan,OPCs,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Pdgfra,OPCs,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Pcdh15,OPCs,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Csf1r,Microglia,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Apbb1ip,Microglia,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+P2ry12,Microglia,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Flt1,Endothelial_Cells,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+B2m,Endothelial_Cells,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Bmp4,Immature_Oligos,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Cnp,Immature_Oligos,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Ccdc153,Ependymal_Cells,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Rsph1,Ependymal_Cells,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Tmem212,Ependymal_Cells,NonNeuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Rbfox3,Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Drd1,dSPN,Neuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
 Pdyn,dSPN,Neuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
 Drd2,iSPN,Neuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
@@ -65,4 +50,18 @@ Pdgfrb,Mural,NonNeuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
 Rgs5,Mural,NonNeuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
 C1qc,Microglia,NonNeuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
 Cx3cr1,Microglia,NonNeuronal,Dorsal_Striatum,Brain,Mouse,Wildermuth_et_al_2025
-
+IL7R,Naive CD4+ T,NA,NA,PBMCs,Human,Seurat_vignette
+CCR7,Naive CD4+ T,NA,NA,PBMCs,Human,Seurat_vignette
+CD14,CD14+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
+LYZ,CD14+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
+IL7R,Memory CD4+,NA,NA,PBMCs,Human,Seurat_vignette
+S100A4,Memory CD4+,NA,NA,PBMCs,Human,Seurat_vignette
+MS4A1,B,NA,NA,PBMCs,Human,Seurat_vignette
+CD8A,CD8+ T,NA,NA,PBMCs,Human,Seurat_vignette
+FCGR3A,FCGR3A+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
+MS4A7,FCGR3A+ Mono,NA,NA,PBMCs,Human,Seurat_vignette
+GNLY,NK,NA,NA,PBMCs,Human,Seurat_vignette
+NKG7,NK,NA,NA,PBMCs,Human,Seurat_vignette
+FCER1A,DC,NA,NA,PBMCs,Human,Seurat_vignette
+CST3,DC,NA,NA,PBMCs,Human,Seurat_vignette
+PPBP,Platelet,NA,NA,PBMCs,Human,Seurat_vignette
