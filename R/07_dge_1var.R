@@ -3,6 +3,7 @@
 # Author: Geoff Dilly
 
 library(here)
+library(yaml)
 library(foreach)
 library(doParallel)
 library(Seurat)
@@ -10,24 +11,23 @@ library(tidyverse)
 library(DESeq2)
 library(ggrepel)
 library(pheatmap)
-scRNA_home_dir <- here()
-setwd(scRNA_home_dir)
 
 # Setup ####
 # Load custom functions
-source("R/modules/plot_utils.R")
-source("R/modules/log_utils.R")
+source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/qc_utils.R"))
+source(here::here("R/modules/plot_utils"))
 
 # Load the configuration file and metadata
-source("sc_experiment_config.R")
-scConfig.Sample_metadata <- read.csv("sc_sample_metadata.csv")
+scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
+scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 
 # Check for required directories
 check_required_dirs()
 
 # Log the start time and a time stamped copy of the script
-write(paste0("07_dge_1var - Start: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
-log_connection <- write_script_log("R/07_dge_1var.R")
+write(paste0("07_dge_1var - Start: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)
+log_connection <- write_script_log(here::here("R/07_dge_1var.R"))
 
 # Setup parallel backend
 n_cores <- max(1, parallel::detectCores() - 1)
@@ -45,11 +45,11 @@ on.exit({
 
 # Pseudobulking and data processing ####
 # Load the clustered Seurat file
-combined_seurat <- readRDS(paste0("R_Data/", scConfig.Prefix, "_combined_clustered.rds"))
+combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 print(unique(combined_seurat$Sample_name))
 
 # Define the cluster identity for plotting and DGE analysis
-cluster_col <- scConfig.cluster_plot_ident
+cluster_col <- scConfig$cluster_plot_ident
 
 # Ensure cluster_col exists in meta.data, default to seurat_clusters if not
 if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
@@ -58,7 +58,7 @@ if (!cluster_col %in% colnames(combined_seurat@meta.data)) {
 }
 
 # Select the assay for DESeq2 analysis
-if (scConfig.soupx_adjust == TRUE) {
+if (scConfig$soupx_adjust) {
   # If SoupX was used, set the default assay to SoupX
   dge_assay <- "SoupX"
 } else {
@@ -74,7 +74,7 @@ pseudobulked_seurat$celltype.treatment <- paste(pseudobulked_seurat$Treatment, p
 
 Idents(pseudobulked_seurat) <- "celltype.treatment"
 
-colnames_vec <- colnames(pseudobulked_seurat$RNA)
+colnames_vec <- colnames(pseudobulked_seurat[[dge_assay]])
 
 # Get clusters and conditions
 clusters <- unique(pseudobulked_seurat[[cluster_col]][, 1])
@@ -90,14 +90,12 @@ summary_list <- foreach(cluster = clusters,
   # Subset matrix for this cluster
   mat <- GetAssayData(pseudobulked_seurat, slot = "counts")[, cols, drop = FALSE]
 
-  # Save to CSV (change file path as needed)
-  write.csv(mat, file = paste0("CSV_Results/DEGs_All/", "Pseudobulk_counts_cluster_", cluster, ".csv"))
+  # Save to CSV
+  write.csv(mat, file = here::here("CSV_Results", "DEGs_All", paste0("Pseudobulk_counts_cluster_", cluster, ".csv")))
 
   # Build colData data.frame from the matrix column names
   sample_names <- colnames(mat)
-
-  # Extract treatment from the names (assumes format: Treatment_Sample-#_Cluster#)
-  Treatment <- sub("_.*", "", sample_names)  # everything before first underscore # nolint
+  Treatment <- sub("_.*", "", sample_names)  # everything before first underscore
   col_data <- data.frame(Treatment = Treatment,
                          row.names = sample_names,
                          Sample_name = sample_names)
@@ -111,11 +109,11 @@ summary_list <- foreach(cluster = clusters,
 
   # Plot PCAs by condition and sample
   pca_plot_by_condition <- DESeq2::plotPCA(rld, intgroup = "Treatment", ntop = 50)
-  save_plot_pdf(pca_plot_by_condition, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_PCA.pdf"),
+  save_plot_pdf(pca_plot_by_condition, here::here("Plots/DESEQ_Plots", "PCAs", paste0(str_replace(cluster, "_", " "), "_PCA.pdf")),
                 height = 6, width = 8)
 
   pca_plot_by_sample <- DESeq2::plotPCA(rld, intgroup = "Sample_name", ntop = 50)
-  save_plot_pdf(pca_plot_by_sample, paste0("Plots/DESEQ_Plots/PCAs/", str_replace(cluster, "_", " "), "_sample_PCA.pdf"),
+  save_plot_pdf(pca_plot_by_sample, here::here("Plots/DESEQ_Plots", "PCAs", paste0(str_replace(cluster, "_", " "), "_sample_PCA.pdf")),
                 height = 6, width = 8)
 
   # Extract the rlog matrix from the object and compute pairwise correlation values
@@ -124,12 +122,12 @@ summary_list <- foreach(cluster = clusters,
 
   # Plot heatmap
   cluster_heatmap <-  pheatmap(rld_cor, annotation = col_data[, c("Treatment"), drop = FALSE])
-  save_plot_pdf(cluster_heatmap, paste0("Plots/DESEQ_Plots/Heatmaps/", str_replace(cluster, "_", " "), "_heatmap_plot.pdf"),
+  save_plot_pdf(cluster_heatmap, here::here("Plots/DESEQ_Plots", "Heatmaps", paste0(str_replace(cluster, "_", " "), "_heatmap_plot.pdf")),
                 height = 6, width = 8)
 
   # Plot dispersion estimates
   dispersion_plot <- plotDispEsts(dds)
-  save_plot_pdf(dispersion_plot, paste0("Plots/DESEQ_Plots/Dispersion_Plots/", str_replace(cluster, "_", " "), "_dispersion_plot.pdf"),
+  save_plot_pdf(dispersion_plot, here::here("Plots/DESEQ_Plots", "Dispersion_Plots", paste0(str_replace(cluster, "_", " "), "_dispersion_plot.pdf")),
                 height = 6, width = 8)
 
   # Set up the contrast for DESeq2, run DGE, and apply LFC shrinkage
@@ -148,7 +146,7 @@ summary_list <- foreach(cluster = clusters,
 
   # Write all results to file
   write.csv(res_tbl,
-            paste0("CSV_Results/DEGs_All/DEG_Results_All_Genes_", conditions[1], "_vs_", conditions[2], "_Cluster_", cluster, ".csv"),
+            here::here("CSV_Results", "DEGs_All", paste0("DEG_Results_All_Genes_", conditions[1], "_vs_", conditions[2], "_Cluster_", cluster, ".csv")),
             quote = FALSE,
             row.names = FALSE)
 
@@ -156,7 +154,7 @@ summary_list <- foreach(cluster = clusters,
   normalized_counts <- data.frame(round(counts(dds, normalized = TRUE), 1))
   colnames(normalized_counts) <- paste(colnames(normalized_counts), "norm", sep = "_")
   write.csv(normalized_counts,
-            paste0("CSV_Results/DEGs_All/", "Normalized_counts_cluster", cluster, "_all_genes.csv"),
+            here::here("CSV_Results", "DEGs_All", paste0("Normalized_counts_cluster", cluster, "_all_genes.csv")),
             quote = FALSE,
             row.names = FALSE)
 
@@ -183,7 +181,7 @@ summary_list <- foreach(cluster = clusters,
 
   # Write significant results to file
   write.csv(sig_res,
-            paste0("CSV_Results/DEGs_All/", "DEG_Results_Significant_Genes_", conditions[1], "_vs_", conditions[2], "_Cluster_", cluster, ".csv"),
+            here::here("CSV_Results", "DEGs_All", paste0("DEG_Results_Significant_Genes_", conditions[1], "_vs_", conditions[2], "_Cluster_", cluster, ".csv")),
             quote = FALSE,
             row.names = FALSE)
 
@@ -206,12 +204,12 @@ summary_list <- foreach(cluster = clusters,
           axis.title = element_text(size = rel(1.25)))
 
   # Save the volcano plot
-  save_plot_pdf(volc_plot, paste0("Plots/DESEQ_Plots/Volcano_Plots/", str_replace(cluster, "_", " "), "_volcano_plot.pdf"),
+  save_plot_pdf(volc_plot, here::here("Plots/DESEQ_Plots", "Volcano_Plots", paste0(str_replace(cluster, "_", " "), "_volcano_plot.pdf")),
                 height = 6, width = 8)
 
   # Make an MA plot for quality control
-  ma_plot <- plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster)))) # nolint
-  save_plot_pdf(ma_plot, paste0("Plots/DESEQ_Plots/MA_Plots/", str_replace(cluster, "_", " "), "_MA_plot.pdf"),
+  ma_plot <- plotMA(res, ylim = c(-3,3), alpha = 0.05, main = (paste0("Cluster: ", as.character(cluster))))
+  save_plot_pdf(ma_plot, here::here("Plots/DESEQ_Plots", "MA_Plots", paste0(str_replace(cluster, "_", " "), "_MA_plot.pdf")),
                 height = 6, width = 8)
 
   # Return the summary
@@ -220,6 +218,6 @@ summary_list <- foreach(cluster = clusters,
 
 # Combine and write summary
 summary_df <- dplyr::bind_rows(summary_list)
-write.csv(summary_df, "CSV_Results/DGE_summary.csv", row.names = FALSE)
+write.csv(summary_df, here::here("CSV_Results", "DGE_summary.csv"), row.names = FALSE)
 
-write(paste0("07_dge_1var - Finish: ", Sys.time()), file = "scRNA_Log.txt", append = TRUE)
+write(paste0("07_dge_1var - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)

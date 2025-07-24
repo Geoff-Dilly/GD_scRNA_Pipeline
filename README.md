@@ -14,7 +14,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - `sc_analysis_env.yaml`: YAML containing Anaconda dependencies.
 - `R/`: R scripts for data processing, clustering, cell identification, visualization, and DGE.
 - `run_pipeline.sh`: Editable Bash script to run the R scripts in order.
-- `sc_experiment_config.R`: R configuration file to set pipeline parameters.
+- `sc_experiment_config.yaml`: YAML configuration file to set pipeline parameters.
 - `sc_sample_metadata.csv`: Metadata CSV file for identifying and labeling samples.
 - `reference/marker_gene_db.csv`: A CSV database of sets of marker genes for cluster analysis.
 
@@ -35,7 +35,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
     conda activate sc_analysis_env
     ```
 4. **Set up metadata and configuration:**
-   Edit `sc_experiment_config.R` and `sc_sample_metadata.csv` as needed
+    - Edit `sc_experiment_config.yaml` and `sc_sample_metadata.csv` as needed
 5. **Run the analysis pipeline:**
     ```sh
     bash run_pipeline.sh
@@ -73,7 +73,6 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - `Logs/` — Run logs and script backups
 - `R/` — R scripts
 
-
 ## Metadata Format
 
 - Metadata is a CSV that must contain four required columns: Sample_name, Sex, Treatment, Raw_data_dir
@@ -97,6 +96,24 @@ Subject_2,F,Ctrl,27,"Raw_Data/Subject_2/outs"
 Subject_3,M,Ctrl,27,"Raw_Data/Subject_3/outs"
 Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
 ```
+
+## Marker Gene Database
+
+- Marker genes can be stored in a CSV database in `references/marker_gene_db.csv`
+- A reference from this database will be used for cell-identification plots
+- Default marker genes (major brain cell types) come from Dilly et al. (2022)
+- Custom references can be added
+- The reference that will be plotted can be set with `scConfig$marker_gene_reference`
+
+**Example:**
+
+|gene|cell_type|cell_class|brain_region|tissue|species|reference|
+|---|----------|----------|------------|------|-------|---------|
+|Mbp|Oligodendrocytes|NonNeuronal|CeA|Brain|Rat|Dilly_et_al_2022|
+|Mobp|Oligodendrocytes|NonNeuronal|CeA|Brain|Rat|Dilly_et_al_2022|
+|Plp1|Oligodendrocytes|NonNeuronal|CeA|Brain|Rat|Dilly_et_al_2022|
+|Gad1|GABA_Neurons|Neuronal|CeA|Brain|Rat|Dilly_et_al_2022|
+|Gad2|Oligodendrocytes|Neuronal|CeA|Brain|Rat|Dilly_et_al_2022|
 
 ## Requirements
 

@@ -84,17 +84,17 @@ dotplot_by_marker_group <- function(
   library(readr)
   library(ggplot2)
 
-  # 1. Read marker gene CSV
+  # Read marker gene CSV
   marker_tbl <- read_csv(marker_csv, show_col_types = FALSE) %>%
     filter(reference == reference_name)
 
-  # 2. Prepare ordered gene list, grouped by category
+  # Prepare ordered gene list, grouped by category
   marker_tbl <- marker_tbl %>%
     mutate(!!gene_group_col := factor(.data[[gene_group_col]], levels = unique(.data[[gene_group_col]]))) %>%
     arrange(.data[[gene_group_col]], gene)
   gene_ordered <- marker_tbl$gene %>% unique()
 
-  # 3. Make DotPlot
+  # Make DotPlot
   p <- DotPlot(seurat_obj, features = gene_ordered, group.by = group_by) +
     RotatedAxis() +
     theme(
@@ -106,7 +106,7 @@ dotplot_by_marker_group <- function(
     ) +
     ggtitle(paste0("DotPlot: Marker Genes Grouped by ", gene_group_col))
 
-  # 4. Add vertical separators between groups (optional)
+  # Add vertical separators between groups (optional)
   if (add_separators) {
     group_lengths <- table(marker_tbl[[gene_group_col]])
     breaks <- cumsum(group_lengths)
