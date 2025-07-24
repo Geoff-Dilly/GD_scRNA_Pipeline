@@ -1,6 +1,7 @@
 # Single-cell Analysis Pipeline 
 
 **Author:** Geoff Dilly, PhD  
+**ORCID:** 0000-0002-6277-9932  
 **Lab:** Messing Lab, UT Austin
 
 ## Overview
