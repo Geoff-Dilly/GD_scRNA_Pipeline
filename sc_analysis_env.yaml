@@ -4,9 +4,10 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - r-base=4.3.3
+  - r-base=4.4.3
   - r-essentials
   - r-devtools
+  - r-biocmanager
   - r-seurat
   - r-soupx
   - r-doparallel
@@ -16,6 +17,7 @@ dependencies:
   - r-ggplot2
   - r-patchwork
   - r-ggrepel
+  - bioconductor-hdf5array
 
 # Two packages need to be installed from GitHub after environment creation
 # After activating your environment, run:
