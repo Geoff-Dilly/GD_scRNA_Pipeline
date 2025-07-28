@@ -7,6 +7,9 @@ set -e
 PROJECT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$PROJECT_HOME"
 
+# Export the current run time as an environment variable
+export RUN_TIME="$(date +%Y%m%d_%H%M%S)"
+
 # Run the R scripts in order
 # Completed or optional scripts can commented out
 

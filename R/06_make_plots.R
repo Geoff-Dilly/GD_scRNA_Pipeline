@@ -11,7 +11,7 @@ library(ggplot2)
 
 # Setup ####
 # Load custom functions
-source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/run_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
 source(here::here("R/modules/plot_utils"))
 
@@ -22,9 +22,13 @@ scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 # Check for required directories
 check_required_dirs()
 
+# Function to get results directory based on run time 
+output_dir <- Get_results_dir(run_time = Sys.getenv("RUN_TIME"), 
+                            prefix = scConfig$prefix)
+
 # Log the start time and a timestamped copy of the script
 write(paste0("06_make_plots - Start: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)
-log_connection <- write_script_log(here::here("R/06_make_plots.R"))
+log_connection <- write_script_log(here::here("R/06_make_plots.R"), log_dir = here::here(output_dir, "Logs"))
 
 # Log all output to the end of the log file
 sink(log_connection, append = TRUE)
@@ -36,7 +40,7 @@ on.exit({
 
 # Load data ####
 # Load the clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("Data", "R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 DefaultAssay(combined_seurat) <- "SCT"
 
 # Set the identity to label clusters
@@ -58,7 +62,7 @@ qc_vlns_plot <- VlnPlot(
   pt.size = 0, ncol = 5
 ) + NoLegend() & theme(axis.text.x = element_blank())
 
-save_plot_pdf(qc_vlns_plot, here::here("Plots/Quality_Control", "QC_VlnPlot.pdf"), height = 3, width = 18)
+save_plot_pdf(qc_vlns_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_VlnPlot.pdf"), height = 3, width = 18)
 
 # Examine QC metrics on the UMAP plot
 qc_umap_plot <- FeaturePlot(
@@ -67,7 +71,7 @@ qc_umap_plot <- FeaturePlot(
   ncol = 5
 ) & theme(axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())
 
-save_plot_pdf(qc_umap_plot, here::here("Plots/Quality_Control", "QC_UMAP.pdf"), height = 3, width = 18)
+save_plot_pdf(qc_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_UMAP.pdf"), height = 3, width = 18)
 
 # Examine doublet score in doublets and non doublets
 if (scConfig$remove_doublets == FALSE) {
@@ -76,7 +80,7 @@ if (scConfig$remove_doublets == FALSE) {
     features = "Doublet_Score",
     split.by = "Doublet_Call"
   )
-  save_plot_pdf(doublet_call_umap_plot, here::here("Plots/Quality_Control", "Doublet_Call_UMAP.pdf"), height = 4, width = 10)
+  save_plot_pdf(doublet_call_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Doublet_Call_UMAP.pdf"), height = 4, width = 10)
 }
 
 # Sex-level QC: Ident = Sex ####
@@ -84,7 +88,7 @@ Idents(combined_seurat) <- combined_seurat$Sex
 
 # Plot by sex on the UMAP
 sex_umap_plot <- DimPlot(combined_seurat)
-save_plot_pdf(sex_umap_plot, here::here("Plots/Quality_Control", "Sex_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(sex_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Sex_UMAP.pdf"), height = 4, width = 6)
 
 # Quality metric violin plots
 qc_bysex_vlns_plot <- VlnPlot(
@@ -93,14 +97,14 @@ qc_bysex_vlns_plot <- VlnPlot(
   pt.size = 0, stack = TRUE, flip = TRUE
 ) + NoLegend() & theme(axis.text.x = element_blank(), axis.title = element_blank())
 
-save_plot_pdf(qc_bysex_vlns_plot, here::here("Plots/Quality_Control", "QC_bySex_VlnPlot.pdf"))
+save_plot_pdf(qc_bysex_vlns_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_bySex_VlnPlot.pdf"))
 
 # Treatment-level QC: Ident = Treatment ####
 Idents(combined_seurat) <- combined_seurat$Treatment
 
 # Plot by sex on the UMAP
 treatment_umap_plot <- DimPlot(combined_seurat)
-save_plot_pdf(treatment_umap_plot, here::here("Plots/Quality_Control", "Treatment_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(treatment_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Treatment_UMAP.pdf"), height = 4, width = 6)
 
 # Quality metric violin plots
 qc_bytreatment_vlns_plot <- VlnPlot(
@@ -109,14 +113,14 @@ qc_bytreatment_vlns_plot <- VlnPlot(
   pt.size = 0, ncol = 5
 ) & theme(axis.title.x = element_blank())
 
-save_plot_pdf(qc_bytreatment_vlns_plot, here::here("Plots/Quality_Control", "QC_byTreatment_VlnPlot.pdf"), height = 3, width = 18)
+save_plot_pdf(qc_bytreatment_vlns_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_byTreatment_VlnPlot.pdf"), height = 3, width = 18)
 
 # Sample-level QC: Ident = Sample_name ####
 Idents(combined_seurat) <- combined_seurat$Sample_name
 
 # Plot by sample on the UMAP
 sample_umap_plot <- DimPlot(combined_seurat)
-save_plot_pdf(sample_umap_plot, here::here("Plots/Quality_Control", "Sample_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Sample_UMAP.pdf"), height = 4, width = 6)
 
 # By sample QC violin plots
 qc_by_sample_vln_plot <- VlnPlot(
@@ -125,7 +129,7 @@ qc_by_sample_vln_plot <- VlnPlot(
   pt.size = 0, stack = TRUE, flip = TRUE
 ) + NoLegend()
 
-save_plot_pdf(qc_by_sample_vln_plot, here::here("Plots/Quality_Control", "QC_bySample_VlnPlot.pdf"), height = 4, width = 12)
+save_plot_pdf(qc_by_sample_vln_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_bySample_VlnPlot.pdf"), height = 4, width = 12)
 
 # Scatterplot: nCount_RNA vs nFeature_RNA, colored by sample
 scatter_nc_vs_nf <- ggplot(
@@ -145,7 +149,7 @@ scatter_nc_vs_nf <- ggplot(
   ) +
   guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
 
-save_plot_pdf(scatter_nc_vs_nf, here::here("Plots/Quality_Control", "Scatter_nCount_vs_nFeature_bySample.pdf"), height = 5, width = 7)
+save_plot_pdf(scatter_nc_vs_nf, here::here(output_dir, "Plots", "Quality_Control", "Scatter_nCount_vs_nFeature_bySample.pdf"), height = 5, width = 7)
 
 # Cluster-level QC: Ident = Seurat_clusters ####
 Idents(combined_seurat) <- cluster_col
@@ -153,12 +157,12 @@ Idents(combined_seurat) <- cluster_col
 # Clustered QC plots
 # Plot by cluster on the UMAP
 sample_umap_plot <- DimPlot(combined_seurat)
-save_plot_pdf(sample_umap_plot, here::here("Plots/Quality_Control", "Cluster_UMAP.pdf"), height = 4, width = 6)
-save_plot_pdf(sample_umap_plot, here::here("Plots/Clustering_Plots", "Cluster_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Cluster_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, here::here(output_dir, "Plots", "Clustering_Plots", "Cluster_UMAP.pdf"), height = 4, width = 6)
 
 sample_umap_plot <- DimPlot(combined_seurat, label = TRUE)
-save_plot_pdf(sample_umap_plot, here::here("Plots/Quality_Control", "Cluster_UMAP_labeled.pdf"), height = 4, width = 6)
-save_plot_pdf(sample_umap_plot, here::here("Plots/Clustering_Plots", "Cluster_UMAP.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, here::here(output_dir, "Plots", "Quality_Control", "Cluster_UMAP_labeled.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_umap_plot, here::here(output_dir, "Plots", "Clustering_Plots", "Cluster_UMAP.pdf"), height = 4, width = 6)
 
 # Proportion bar plots
 cell_count_barplot <- ggplot(
@@ -172,7 +176,7 @@ cell_count_barplot <- ggplot(
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   guides(fill = "none")
 
-save_plot_pdf(cell_count_barplot, here::here("Plots/Quality_Control", "Cell_Counts_Barplot.pdf"), height = 4, width = 6)
+save_plot_pdf(cell_count_barplot, here::here(output_dir, "Plots", "Quality_Control", "Cell_Counts_Barplot.pdf"), height = 4, width = 6)
 
 sample_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
@@ -182,7 +186,7 @@ sample_prop_bar_plot <- ggplot(
   RotatedAxis() +
   xlab("Sample Name")
 
-save_plot_pdf(sample_prop_bar_plot, here::here("Plots/Quality_Control", "Sample_prop_barPlot.pdf"), height = 4, width = 6)
+save_plot_pdf(sample_prop_bar_plot, here::here(output_dir, "Plots", "Quality_Control", "Sample_prop_barPlot.pdf"), height = 4, width = 6)
 
 cluster_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
@@ -192,7 +196,7 @@ cluster_prop_bar_plot <- ggplot(
   RotatedAxis() +
   xlab("Sample Name")
 
-save_plot_pdf(cluster_prop_bar_plot, here::here("Plots/Quality_Control", "Cluster_prop_barPlot.pdf"), height = 4, width = 6)
+save_plot_pdf(cluster_prop_bar_plot, here::here(output_dir, "Plots", "Quality_Control", "Cluster_prop_barPlot.pdf"), height = 4, width = 6)
 
 cond_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
@@ -203,7 +207,7 @@ cond_prop_bar_plot <- ggplot(
   RotatedAxis() +
   xlab("Sample Name")
 
-save_plot_pdf(cond_prop_bar_plot, here::here("Plots/Quality_Control", "Cond_prop_barPlot.pdf"), height = 4, width = 6)
+save_plot_pdf(cond_prop_bar_plot, here::here(output_dir, "Plots", "Quality_Control", "Cond_prop_barPlot.pdf"), height = 4, width = 6)
 
 sex_prop_bar_plot <- ggplot(
   combined_seurat@meta.data,
@@ -214,7 +218,7 @@ sex_prop_bar_plot <- ggplot(
   RotatedAxis() +
   xlab("Cluster")
 
-save_plot_pdf(sex_prop_bar_plot, here::here("Plots/Quality_Control", "Sex_prop_barPlot.pdf"), height = 4, width = 6)
+save_plot_pdf(sex_prop_bar_plot, here::here(output_dir, "Plots", "Quality_Control", "Sex_prop_barPlot.pdf"), height = 4, width = 6)
 
 # By cluster QC violin plots
 qc_by_cluster_vln_plot <- VlnPlot(
@@ -223,18 +227,18 @@ qc_by_cluster_vln_plot <- VlnPlot(
   pt.size = 0, stack = TRUE, flip = TRUE
 ) + NoLegend()
 
-save_plot_pdf(qc_by_cluster_vln_plot, here::here("Plots/Quality_Control", "QC_byCluster_VlnPlot.pdf"), height = 4, width = 12)
+save_plot_pdf(qc_by_cluster_vln_plot, here::here(output_dir, "Plots", "Quality_Control", "QC_byCluster_VlnPlot.pdf"), height = 4, width = 12)
 
 # Marker gene plots ####
-all_markers <- read.csv(here::here("CSV_Results", "Marker_Genes_All", "All_marker_genes.csv"))
+all_markers <- read.csv(here::here(output_dir, "CSV_Results", "Marker_Genes_All", "All_marker_genes.csv"))
 
 top_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC)
 top_marker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()
-save_plot_pdf(top_marker_dotplot, here::here("Plots/Clustering_Plots", "Top_Marker_DotPlot.pdf"), height = 12, width = 18)
+save_plot_pdf(top_marker_dotplot, here::here(output_dir, "Plots", "Clustering_Plots", "Top_Marker_DotPlot.pdf"), height = 12, width = 18)
 
 top_markers2 <- all_markers %>% group_by(cluster) %>% slice_max(n = 2, order_by = avg_log2FC)
 top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
-save_plot_pdf(top2markers_dotplot, here::here("Plots/Clustering_Plots", "Top2_Markers_DotPlot.pdf"), height = 12, width = 18)
+save_plot_pdf(top2markers_dotplot, here::here(output_dir, "Plots", "Clustering_Plots", "Top2_Markers_DotPlot.pdf"), height = 12, width = 18)
 
 marker_stack_vln_plot <- make_stacked_vln_plot(
   seurat_obj = combined_seurat,
@@ -245,14 +249,14 @@ marker_stack_vln_plot <- make_stacked_vln_plot(
   pt.size = 0,
   gene_label_size = 8
 )
-save_plot_pdf(marker_stack_vln_plot, here::here("Plots/Clustering_Plots", "Top_Marker_stacked_vln_plot.pdf"), height = 12, width = 4)
+save_plot_pdf(marker_stack_vln_plot, here::here(output_dir, "Plots", "Clustering_Plots", "Top_Marker_stacked_vln_plot.pdf"), height = 12, width = 4)
 
 marker_tbl <- read.csv(here::here("reference", "marker_gene_db.csv"), stringsAsFactors = FALSE)
 major_marker_genes <- marker_tbl %>% filter(reference == scConfig$marker_gene_reference) %>% pull(gene)
 
 major_marker_genes_unique <- unique(unlist(major_marker_genes))
 major_cells_dotplot <- DotPlot(combined_seurat, features = major_marker_genes_unique) + RotatedAxis()
-save_plot_pdf(major_cells_dotplot, here::here("Plots/Clustering_Plots", "Major_cells_dotplot.pdf"), height = 10, width = 12)
+save_plot_pdf(major_cells_dotplot, here::here(output_dir, "Plots", "Clustering_Plots", "Major_cells_dotplot.pdf"), height = 10, width = 12)
 
 brain_marker_stack_vln_plot <- make_stacked_vln_plot(
   seurat_obj = combined_seurat,
@@ -263,7 +267,7 @@ brain_marker_stack_vln_plot <- make_stacked_vln_plot(
   pt.size = 0,
   gene_label_size = 8
 )
-save_plot_pdf(brain_marker_stack_vln_plot, here::here("Plots/Clustering_Plots", "Brainmarker_stacked_vln_plot.pdf"), height = 12, width = 4)
+save_plot_pdf(brain_marker_stack_vln_plot, here::here(output_dir, "Plots", "Clustering_Plots", "Brainmarker_stacked_vln_plot.pdf"), height = 12, width = 4)
 
 all_markers_list <- c(major_marker_genes_unique)
 
@@ -271,14 +275,14 @@ for (marker in all_markers_list) {
   gene_feature_plot <- FeaturePlot(combined_seurat, features = marker)
   save_plot_pdf(
     gene_feature_plot,
-    here::here("Plots/Clustering_Plots", "Marker_Feature_Plots", paste0(marker, "_FeaturePlot.pdf")),
+    here::here(output_dir, "Plots", "Clustering_Plots", "Marker_Feature_Plots", paste0(marker, "_FeaturePlot.pdf")),
     height = 6, width = 8
   )
 
   gene_violin_plot <- VlnPlot(combined_seurat, features = marker, pt.size = 0) + NoLegend()
   save_plot_pdf(
     gene_violin_plot,
-    here::here("Plots/Clustering_Plots", "Marker_Violin_Plots", paste0(marker, "_ViolinPlot.pdf")),
+    here::here(output_dir, "Plots", "Clustering_Plots", "Marker_Violin_Plots", paste0(marker, "_ViolinPlot.pdf")),
     height = 6, width = 8
   )
 }
@@ -291,7 +295,7 @@ cell_types_dotgrid <- dotplot_by_marker_group(
   gene_group_col = "cell_type",
   add_separators = TRUE
 )
-save_plot_pdf(cell_types_dotgrid, here::here("Plots/Clustering_Plots", "Brainmarker_dotgrid_plot.pdf"), height = 12, width = 10)
+save_plot_pdf(cell_types_dotgrid, here::here(output_dir, "Plots", "Clustering_Plots", "Brainmarker_dotgrid_plot.pdf"), height = 12, width = 10)
 
 # Log the completion time
 write(paste0("06_make_plots - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)

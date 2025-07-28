@@ -13,20 +13,18 @@ scRNA_home_dir=$(pwd)
 echo -e "\nSetting up scRNA analysis pipeline in: \n$scRNA_home_dir\n"
 
 # Create the directories that the single-cell pipeline needs to run
-mkdir -p "CSV_Results/Cluster_Counts"
-mkdir -p "CSV_Results/DEGs_All"
-mkdir -p "CSV_Results/Marker_Genes_All"
-mkdir -p "Raw_Data"
-mkdir -p "Plots/Clustering_Plots/Marker_Feature_Plots/"
-mkdir -p "Plots/Clustering_Plots/Marker_Violin_Plots/"
-mkdir -p "Plots/DESEQ_Plots/Dispersion_Plots"
-mkdir -p "Plots/DESEQ_Plots/Heatmaps"
-mkdir -p "Plots/DESEQ_Plots/MA_Plots"
-mkdir -p "Plots/DESEQ_Plots/PCAs"
-mkdir -p "Plots/DESEQ_Plots/Volcano_Plots"
-mkdir -p "Plots/Quality_Control"
-mkdir -p "R_Data"
-mkdir -p "Logs"
+mkdir -p "Results"
+mkdir -p "Data/Raw_Data"
+mkdir -p "Results/Plots/Clustering_Plots/Marker_Feature_Plots/"
+mkdir -p "Results/Plots/Clustering_Plots/Marker_Violin_Plots/"
+mkdir -p "Results/Plots/DESEQ_Plots/Dispersion_Plots"
+mkdir -p "Results/Plots/DESEQ_Plots/Heatmaps"
+mkdir -p "Results/Plots/DESEQ_Plots/MA_Plots"
+mkdir -p "Results/Plots/DESEQ_Plots/PCAs"
+mkdir -p "Results/Plots/DESEQ_Plots/Volcano_Plots"
+mkdir -p "Results/Plots/Quality_Control"
+mkdir -p "Data/R_Data"
+mkdir -p "Results/Logs"
 
 # Add a here file to the home directory
 touch .here
