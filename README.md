@@ -71,7 +71,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 - `data/R_Data/` — RDS files of Seurat objects 
 - `results/run_name/plots/` — Output figures and QC plots
 - `results/run_name/csv_results/` - CSVs of cell counts, markers, and DGE results
-- `results/logs/` — Run logs and script backups
+- `results/run_name/logs/` — Run logs and script backups
 - `R/` — R scripts
 
 ## Metadata Format
