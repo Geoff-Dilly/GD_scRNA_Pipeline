@@ -52,12 +52,13 @@ all_markers <- FindAllMarkers(object = combined_seurat, random.seed = 42)
 all_markers$PCT_Fold <- all_markers$pct.1 / all_markers$pct.2
 all_markers$PCT_Delta <- all_markers$pct.1 - all_markers$pct.2
 write.csv(all_markers, here::here(output_dir, "csv_results", "Marker_Genes_All", "All_marker_genes.csv"))
+write.csv(all_markers, here::here("reference", "All_marker_genes.csv"))
 
 # Make more manageable lists of the top markers and save as CSV
-top30_cell_type_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 30, order_by = avg_log2FC)
+top30_cell_type_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 30, order_by = p_val_adj)
 write.csv(top30_cell_type_markers, here::here(output_dir, "csv_results", "Marker_Genes_All", "Marker_Genes_Top30.csv"))
 
-top10_cell_type_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 10, order_by = avg_log2FC)
+top10_cell_type_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 10, order_by = p_val_adj)
 write.csv(top10_cell_type_markers, here::here(output_dir, "csv_results", "Marker_Genes_All", "Marker_Genes_Top10.csv"))
 
 # Make plots ####

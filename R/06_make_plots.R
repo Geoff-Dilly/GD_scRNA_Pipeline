@@ -230,13 +230,13 @@ qc_by_cluster_vln_plot <- VlnPlot(
 save_plot_pdf(qc_by_cluster_vln_plot, here::here(output_dir, "plots", "Quality_Control", "QC_byCluster_VlnPlot.pdf"), height = 4, width = 12)
 
 # Marker gene plots ####
-all_markers <- read.csv(here::here(output_dir, "csv_results", "Marker_Genes_All", "All_marker_genes.csv"))
+all_markers <- read.csv(here::here("reference", "All_marker_genes.csv"))
 
-top_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC)
+top_markers <- all_markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = p_val_adj)
 top_marker_dotplot <- DotPlot(combined_seurat, features = unique(top_markers$gene)) + RotatedAxis()
 save_plot_pdf(top_marker_dotplot, here::here(output_dir, "plots", "Cluster_Plots", "Top_Marker_DotPlot.pdf"), height = 12, width = 18)
 
-top_markers2 <- all_markers %>% group_by(cluster) %>% slice_max(n = 2, order_by = avg_log2FC)
+top_markers2 <- all_markers %>% group_by(cluster) %>% slice_max(n = 2, order_by = p_val_adj)
 top2markers_dotplot <- DotPlot(combined_seurat, features = unique(top_markers2$gene)) + RotatedAxis()
 save_plot_pdf(top2markers_dotplot, here::here(output_dir, "plots", "Cluster_Plots", "Top2_Markers_DotPlot.pdf"), height = 12, width = 18)
 
