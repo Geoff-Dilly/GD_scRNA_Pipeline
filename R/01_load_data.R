@@ -14,7 +14,7 @@ library(SoupX)
 # Load custom functions
 source(here::here("R/modules/run_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
-source(here::here("R/modules/plot_utils"))
+source(here::here("R/modules/plot_utils.R"))
 
 # Load the configuration file and metadata
 scConfig <- yaml::read_yaml(here::here("sc_experiment_config.yaml"))
