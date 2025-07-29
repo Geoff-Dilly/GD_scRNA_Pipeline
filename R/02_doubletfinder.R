@@ -24,7 +24,7 @@ scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 check_required_dirs()
 
 # Function to get results directory based on run time 
-output_dir <- Get_results_dir(run_time = Sys.getenv("RUN_TIME"), 
+output_dir <- get_results_dir(run_time = Sys.getenv("RUN_TIME"), 
                             prefix = scConfig$prefix)
 # Setup parallel backend
 n_cores <- max(1, parallel::detectCores() - 1)
@@ -33,7 +33,7 @@ registerDoParallel(cl)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("02_doubletfinder - Start: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)
-log_connection <- write_script_log(here::here("R/02_doubletfinder.R"), log_dir = here::here(output_dir, "Logs"))
+log_connection <- write_script_log(here::here("R/02_doubletfinder.R"), log_dir = here::here(output_dir, "logs"))
 
 # Log all output to the end of the log file
 sink(log_connection, append = TRUE)
@@ -50,7 +50,7 @@ str_sample_list <- scConfig$Sample_metadata$Sample_name
 
 # Run DoubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
-  sample_seurat <- readRDS(here::here("Data", "R_Data", paste0(sample_name, "_seurat.rds")))
+  sample_seurat <- readRDS(here::here("data", "R_Data", paste0(sample_name, "_seurat.rds")))
 
   sample_seurat <- NormalizeData(sample_seurat)
   sample_seurat <- FindVariableFeatures(sample_seurat, selection.method = "vst", nfeatures = 2000)
@@ -91,7 +91,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
   # Save the processed Seurat object
   saveRDS(
     sample_seurat,
-    file = here::here("Data", "R_Data", paste0(sample_name, "_seurat_Doublets.rds"))
+    file = here::here("data", "R_Data", paste0(sample_name, "_seurat_Doublets.rds"))
   )
   NULL
 }

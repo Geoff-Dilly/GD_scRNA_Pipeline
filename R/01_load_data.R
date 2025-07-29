@@ -24,7 +24,7 @@ scConfig$Sample_metadata <- read.csv(here::here("sc_sample_metadata.csv"))
 check_required_dirs()
 
 # Function to get results directory based on run time 
-output_dir <- Get_results_dir(run_time = Sys.getenv("RUN_TIME"), 
+output_dir <- get_results_dir(run_time = Sys.getenv("RUN_TIME"), 
                             prefix = scConfig$prefix)
 
 # Setup parallel backend
@@ -34,7 +34,7 @@ registerDoParallel(cl)
 
 # Log the start time and a timestamped copy of the script
 write(paste0("01_load_data - Start: ", Sys.time()), file = here::here(output_dir, "scRNA_Log.txt"), append = TRUE)
-log_connection <- write_script_log(here::here("R/01_load_data.R"), log_dir = here::here(output_dir, "Logs"))
+log_connection <- write_script_log(here::here("R/01_load_data.R"), log_dir = here::here(output_dir, "logs"))
 
 # Log all output to the end of the log file
 sink(log_connection, append = TRUE)
@@ -78,7 +78,7 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   }
   saveRDS(
     sample_seurat,
-    file = here::here("Data", "R_Data", paste0(sample$Sample_name, "_seurat.rds"))
+    file = here::here("data", "R_Data", paste0(sample$Sample_name, "_seurat.rds"))
   )
 
   return(top_ambient)
@@ -89,7 +89,7 @@ if (scConfig$compute_soupx) {
   summary_df <- bind_rows(top_ambient_genes)
   write.csv(
     summary_df,
-    here::here(output_dir, "CSV_Results", "Ambient_genes_summary.csv"),
+    here::here(output_dir, "csv_results", "Ambient_genes_summary.csv"),
     row.names = FALSE
   )
 }

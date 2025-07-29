@@ -6,11 +6,11 @@
 
 ## Overview
 
-This repository provides a streamlined pipeline for analyzing 10x Chromium single-cell data using R and Seurat. The pipeline performs QC, clusters cells, identifies marker genes, and generates plots and CSV files in a recommended directory structure. This pipeline is intended for neuroscience research in the Messing Lab at UT Austin, and can be adapted for similar use. 
+This repository provides a streamlined pipeline for analyzing 10x Chromium single-cell data using R and Seurat. The pipeline performs QC, clusters cells, identifies marker genes, and generates plots and CSV files in a standardized directory structure. This pipeline was developed for neuroscience research in the Messing Lab at UT Austin, and can be adapted for similar use. 
 
 ## Contents
 
-- `install.sh`: Bash script to generate the recommended file structure in a local directory. 
+- `install.sh`: Bash script to generate the file structure in a local directory. 
 - `setup_env.sh`: Bash script to make an Anaconda environment with the appropriate dependencies.
 - `sc_analysis_env.yaml`: YAML containing Anaconda dependencies.
 - `R/`: R scripts for data processing, clustering, cell identification, visualization, and DGE.
@@ -58,7 +58,7 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 |---|---|---|
 | 01_load_data.R | Load sample data, metadata, run SoupX, and basic QC | Sample-level Seurat object |
 | 02_doubletfinder.R | Run DoubletFinder on each sample | Sample-level Seurat object |
-| 03_normalize_and_integrate.R | Integrate samples and normalize with scTransform | Experiment-level Seurat objects |
+| 03_normalize_and_integrate.R | Integrate samples and normalize with SCTransform | Experiment-level Seurat objects |
 | 04_cluster_cells.R | Perform dimensional reduction and clustering analysis | Experiment-level Seurat object |
 | 05_id_marker_genes.R | Identify marker genes by cluster | CSVs |
 | 05b_rename_clusters.R | *Optional:* Add cell type names to metadata | Experiment-level Seurat object |
@@ -67,11 +67,11 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 ## Directory Structure
 
-- `Raw_Data/` — Raw input files (10x count matrices)
-- `R_Data/` — RDS files of Seurat objects 
-- `Plots/` — Output figures and QC plots
-- `CSV_Results/` - CSVs of cell counts, markers, and DGE results
-- `Logs/` — Run logs and script backups
+- `data/Raw_Data/` — *Optional:* Raw input files (10x count matrices)
+- `data/R_Data/` — RDS files of Seurat objects 
+- `results/run_name/plots/` — Output figures and QC plots
+- `results/run_name/csv_results/` - CSVs of cell counts, markers, and DGE results
+- `results/logs/` — Run logs and script backups
 - `R/` — R scripts
 
 ## Metadata Format
@@ -84,27 +84,27 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 | Sample_name | Sex | Treatment | Age | Raw_data_dir |
 |---|---|---|---|---|
-| Subject_1 | M | Drug | 24 | "Raw_Data/Subject_1/outs" |
-| Subject_2 | F | Ctrl | 27 | "Raw_Data/Subject_2/outs" |
-| Subject_3 | M | Ctrl | 27 | "Raw_Data/Subject_3/outs" |
-| Subject_4 | F | Drug | 26 | "Raw_Data/Subject_4/outs" |
+| Subject_1 | M | Drug | 24 | "data/Raw_Data/Subject_1/outs" |
+| Subject_2 | F | Ctrl | 27 | "data/Raw_Data/Subject_2/outs" |
+| Subject_3 | M | Ctrl | 27 | "data/Raw_Data/Subject_3/outs" |
+| Subject_4 | F | Drug | 26 | "data/Raw_Data/Subject_4/outs" |
 
 **Saved as a CSV:**
 ```
 Sample_name,Sex,Treatment,Age,Raw_data_dir
-Subject_1,M,Drug,24,"Raw_Data/Subject_1/outs"
-Subject_2,F,Ctrl,27,"Raw_Data/Subject_2/outs"
-Subject_3,M,Ctrl,27,"Raw_Data/Subject_3/outs"
-Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
+Subject_1,M,Drug,24,"data/Raw_Data/Subject_1/outs"
+Subject_2,F,Ctrl,27,"data/Raw_Data/Subject_2/outs"
+Subject_3,M,Ctrl,27,"data/Raw_Data/Subject_3/outs"
+Subject_4,F,Drug,26,"data/Raw_Data/Subject_4/outs"
 ```
 
 ## Marker Gene Database
 
-- Marker genes can be stored in a CSV database in `references/marker_gene_db.csv`
+- Marker genes can be stored in a CSV database in `reference/marker_gene_db.csv`
 - A reference from this database will be used for cell-identification plots
 - Default marker genes (major brain cell types) come from Dilly et al. (2022)
 - Custom references can be added
-- The reference that will be plotted can be set with `scConfig$marker_gene_reference`
+- The reference that will be plotted can be set in `sc_experiment_config.yaml` under `marker_gene_reference`
 
 **Example:**
 
@@ -114,11 +114,11 @@ Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
 |Mobp|Oligodendrocytes|NonNeuronal|CeA|Brain|Rat|Dilly_et_al_2022|
 |Plp1|Oligodendrocytes|NonNeuronal|CeA|Brain|Rat|Dilly_et_al_2022|
 |Gad1|GABA_Neurons|Neuronal|CeA|Brain|Rat|Dilly_et_al_2022|
-|Gad2|Oligodendrocytes|Neuronal|CeA|Brain|Rat|Dilly_et_al_2022|
+|Gad2|GABA_Neurons|Neuronal|CeA|Brain|Rat|Dilly_et_al_2022|
 
 ## Requirements
 
-- R = 4.3.3
+- R = 4.4.3
 - Seurat ≥ 5.0
 - Anaconda
 - See `sc_analysis_env.yaml` for dependencies

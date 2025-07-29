@@ -4,6 +4,8 @@ library(Seurat)
 library(patchwork)
 library(ggplot2)
 library(purrr)
+library(dplyr)
+library(readr)
 
 #' @title Save ggplot to PDF
 #' @description Saves a ggplot object to a PDF file with specified dimensions.
@@ -79,10 +81,6 @@ dotplot_by_marker_group <- function(
   separator_linetype = "dashed",
   separator_size = 0.7
 ) {
-  library(Seurat)
-  library(dplyr)
-  library(readr)
-  library(ggplot2)
 
   # Read marker gene CSV
   marker_tbl <- read_csv(marker_csv, show_col_types = FALSE) %>%
