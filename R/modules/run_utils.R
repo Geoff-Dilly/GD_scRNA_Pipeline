@@ -46,3 +46,24 @@ check_required_dirs <- function() {
     stop("Required directories are missing. Please run install.sh to set up the directory structure.")
   }
 }
+
+#' @title Get Matrix Path
+#' @description This function unzips/untars the matrix file if necessary
+prepare_matrix_dir <- function(raw_data_dir, req_matrix) {
+
+  matrix_dir <- file.path(raw_data_dir, req_matrix)
+  tar_file   <- paste0(matrix_dir, ".tar.gz")
+  zip_file   <- paste0(matrix_dir, ".zip")
+
+  if (dir.exists(matrix_dir)) {
+    return(matrix_dir)
+  } else if (file.exists(tar_file)) {
+    utils::untar(tar_file, exdir = raw_data_dir)
+    return(matrix_dir)
+  } else if (file.exists(zip_file)) {
+    utils::unzip(zip_file, exdir = raw_data_dir)
+    return(matrix_dir)
+  } else {
+    stop(paste("No compatible 10x matrix found in :", raw_data_dir))
+  }
+}

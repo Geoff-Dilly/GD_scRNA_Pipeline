@@ -17,6 +17,7 @@ home_folder: __HOME_DIR__
 # Raw_data_folder - Datatype: String (Path)
 # Location of the 10x cellranger runs that will be used as raw data
 # Should contain data that can be read by the Read10X() function in Seurat
+# The pipeline does not use this variable, it only used the folder in metadata
 raw_data_folder: Raw_Data
 
 # mito_pattern - Datatype: String

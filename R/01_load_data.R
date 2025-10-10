@@ -12,7 +12,7 @@ library(SoupX)
 
 # Setup ####
 # Load custom functions
-source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/run_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
 source(here::here("R/modules/plot_utils.R"))
 
@@ -54,7 +54,8 @@ sample_list <- split(scConfig$Sample_metadata, seq_len(nrow(scConfig$Sample_meta
 
 top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "SoupX", "dplyr")) %dopar% {
   top_ambient <- NULL
-  filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
+  matrix_path <- prepare_matrix_dir(sample$Raw_data_dir, "filtered_feature_bc_matrix")
+  filt_matrix <- Read10X(matrix_path)
   sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
 
   if (scConfig$compute_soupx) {

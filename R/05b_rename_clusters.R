@@ -8,7 +8,7 @@ library(Seurat)
 
 # Setup ####
 # Load custom functions
-source(here::here("R/modules/log_utils.R"))
+source(here::here("R/modules/run_utils.R"))
 source(here::here("R/modules/qc_utils.R"))
 source(here::here("R/modules/plot_utils.R"))
 
