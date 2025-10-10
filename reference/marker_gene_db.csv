@@ -3,7 +3,7 @@ Mbp,Oligodendrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Mobp,Oligodendrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Plp1,Oligodendrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Gad1,GABA_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
-Gad2,Oligodendrocytes,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
+Gad2,GABA_Neurons,Neuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Ndrg2,Astrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Slc1a2,Astrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
 Slc4a4,Astrocytes,Nonneuronal,CeA,Brain,Rat,Dilly_et_al_2022
@@ -65,3 +65,4 @@ NKG7,NK,NA,NA,PBMCs,Human,Seurat_vignette
 FCER1A,DC,NA,NA,PBMCs,Human,Seurat_vignette
 CST3,DC,NA,NA,PBMCs,Human,Seurat_vignette
 PPBP,Platelet,NA,NA,PBMCs,Human,Seurat_vignette
+
