@@ -48,7 +48,7 @@ check_required_dirs <- function() {
 }
 
 #' @title Get Matrix Path
-#' @description This function unzips/untars the matrix file if necessary
+#' @description Extract the matrix from .zip/.tar if necessary
 prepare_matrix_dir <- function(raw_data_dir, req_matrix) {
 
   matrix_dir <- file.path(raw_data_dir, req_matrix)
@@ -56,14 +56,17 @@ prepare_matrix_dir <- function(raw_data_dir, req_matrix) {
   zip_file   <- paste0(matrix_dir, ".zip")
 
   if (dir.exists(matrix_dir)) {
-    return(matrix_dir)
+    message("Matrix dir detected: No extraction needed")
+
   } else if (file.exists(tar_file)) {
+    message("Extracting matrix from .tar file: ", tar_file)
     utils::untar(tar_file, exdir = raw_data_dir)
-    return(matrix_dir)
+
   } else if (file.exists(zip_file)) {
+    message("Extracting matrix from .zip file: ", zip_file)
     utils::unzip(zip_file, exdir = raw_data_dir)
-    return(matrix_dir)
+
   } else {
-    stop(paste("No compatible 10x matrix found in :", raw_data_dir))
+    stop(paste("No compatible 10x matrix found in: ", raw_data_dir))
   }
 }

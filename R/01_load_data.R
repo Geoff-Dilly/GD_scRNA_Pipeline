@@ -54,10 +54,18 @@ sample_list <- split(scConfig$Sample_metadata, seq_len(nrow(scConfig$Sample_meta
 
 top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "SoupX", "dplyr")) %dopar% {
   top_ambient <- NULL
-  matrix_path <- prepare_matrix_dir(sample$Raw_data_dir, "filtered_feature_bc_matrix")
-  filt_matrix <- Read10X(matrix_path)
+
+  # Ensure matrix directories are extracted and ready
+  prepare_matrix_dir(sample$Raw_data_dir, "filtered_feature_bc_matrix")
+  if (scConfig$compute_soupx) {
+    prepare_matrix_dir(sample$Raw_data_dir, "raw_feature_bc_matrix")
+  }
+
+  # Load the 10x data into a Seurat object
+  filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
   sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
 
+  # Compute SoupX assay (optional)
   if (scConfig$compute_soupx) {
     soupx_results <- run_soupx_correction(sample, sample_seurat)
     sample_seurat <- soupx_results$seurat_obj
