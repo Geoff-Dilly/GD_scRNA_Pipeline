@@ -20,8 +20,7 @@ check_required_dirs <- function() {
 
 #' @title Make Results Directory
 #' @description This function creates a results directory structure for the scRNA analysis pipeline.
-get_results_dir <- function(run_time = Sys.getenv("RUN_TIME"), 
-                           prefix = scConfig$prefix) {
+get_results_dir <- function(run_time = Sys.getenv("RUN_TIME"), prefix = scConfig$prefix) {
 
   # Create a run name based on the project name and run time
   run_name <- paste0(prefix, "_", run_time)
