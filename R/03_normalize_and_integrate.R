@@ -64,7 +64,8 @@ seurat_objects <- PrepSCTIntegration(object.list = seurat_objects, anchor.featur
 anchors <- FindIntegrationAnchors(
   object.list = seurat_objects,
   normalization.method = "SCT",
-  anchor.features = features
+  anchor.features = features,
+  verbose = TRUE
 )
 
 # Integrate the datasets
