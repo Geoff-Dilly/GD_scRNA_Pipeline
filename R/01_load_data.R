@@ -56,14 +56,34 @@ top_ambient_genes <- foreach(sample = sample_list, .packages = c("Seurat", "Soup
   top_ambient <- NULL
 
   # Ensure matrix directories are extracted and ready
-  prepare_matrix_dir(sample$Raw_data_dir, "filtered_feature_bc_matrix")
+  prepare_matrix_dir(
+    sample$Raw_data_dir,
+    if (dir.exists(file.path(sample$Raw_data_dir, "sample_filtered_feature_bc_matrix")))
+      "sample_filtered_feature_bc_matrix"
+    else
+      "filtered_feature_bc_matrix"
+  )
+
   if (scConfig$compute_soupx) {
-    prepare_matrix_dir(sample$Raw_data_dir, "raw_feature_bc_matrix")
+    prepare_matrix_dir(
+      sample$Raw_data_dir,
+      if (dir.exists(file.path(sample$Raw_data_dir, "sample_raw_feature_bc_matrix")))
+        "sample_raw_feature_bc_matrix"
+      else
+        "raw_feature_bc_matrix"
+    )
   }
 
   # Load the 10x data into a Seurat object
-  filt_matrix <- Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
-  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
+filt_matrix <- Read10X(
+  file.path(
+    sample$Raw_data_dir,
+    if (dir.exists(file.path(sample$Raw_data_dir, "sample_filtered_feature_bc_matrix")))
+      "sample_filtered_feature_bc_matrix"
+    else
+      "filtered_feature_bc_matrix"
+  )
+)  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
 
   # Compute SoupX assay (optional)
   if (scConfig$compute_soupx) {

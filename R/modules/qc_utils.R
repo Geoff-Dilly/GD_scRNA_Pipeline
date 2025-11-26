@@ -80,8 +80,23 @@ strip_seurat_obj <- function(seurat_obj) {
 #' @description Run SoupX on an unfiltered Seurat object and add as assay
 run_soupx_correction <- function(sample, seurat_obj, output_dir = "R_Data") {
   # Load the unfiltered matrix for SoupX
-  filt_matrix <- Seurat::Read10X(file.path(sample$Raw_data_dir, "filtered_feature_bc_matrix"))
-  raw_matrix <- Seurat::Read10X(file.path(sample$Raw_data_dir, "raw_feature_bc_matrix"))
+  filt_matrix <- Read10X(
+  file.path(
+    sample$Raw_data_dir,
+    if (dir.exists(file.path(sample$Raw_data_dir, "sample_filtered_feature_bc_matrix")))
+      "sample_filtered_feature_bc_matrix"
+    else
+      "filtered_feature_bc_matrix"
+  ))
+  
+  raw_matrix <- Read10X(
+  file.path(
+    sample$Raw_data_dir,
+    if (dir.exists(file.path(sample$Raw_data_dir, "sample_raw_feature_bc_matrix")))
+      "sample_raw_feature_bc_matrix"
+    else
+      "raw_feature_bc_matrix"
+  ))
 
   # Minimally cluster the seurat seurat_object
   seurat_obj <- Seurat::SCTransform(seurat_obj, verbose = FALSE)
