@@ -67,7 +67,6 @@ seurat_combined <- RunPCA(seurat_combined)
 # Save the object with SCT normalization and PCA
 sct_obj_path <- here::here("R_Data", paste0(scConfig$prefix, "_object_norm.rds"))
 saveRDS(seurat_combined, sct_obj_path)
-seurat_combined <- readRDS(sct_obj_path)
 
 # Integrate the samples ####
 seurat_combined <- IntegrateLayers(object = seurat_combined, 
