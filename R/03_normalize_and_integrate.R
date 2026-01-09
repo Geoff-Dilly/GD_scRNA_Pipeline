@@ -50,42 +50,46 @@ for (sample in str_sample_list) {
   seurat_objects[[sample]] <- sample_seurat
 }
 
-# Normalize with SCTransform ####
-seurat_objects <- lapply(seurat_objects, function(obj) {
-  SCTransform(obj, assay = "RNA", verbose = TRUE)
-})
+# Merge and normalize with SCTransform ####
+# Merge the Seurat objects
+seurat_combined <- merge(x = seurat_objects[[1]], y = seurat_objects[-1])
+rm(seurat_objects)
 
-# Integrate the datasets ####
-# Select integration features
-features <- SelectIntegrationFeatures(object.list = seurat_objects, nfeatures = 3000)
+# Perform SCTransform and PCA
+seurat_combined <- SCTransform(seurat_combined,
+                               assay = "RNA",
+                               verbose = TRUE,
+                               conserve.memory = TRUE,
+                               return.only.var.genes = TRUE)
 
-# Prep objects for integration
-seurat_objects <- PrepSCTIntegration(object.list = seurat_objects, anchor.features = features)
-anchors <- FindIntegrationAnchors(
-  object.list = seurat_objects,
-  normalization.method = "SCT",
-  anchor.features = features,
-  verbose = TRUE
-)
+seurat_combined <- RunPCA(seurat_combined)
 
-# Integrate the datasets
-integrated_seurat <- IntegrateData(
-  anchorset = anchors,
-  normalization.method = "SCT"
-)
+# Save the object with SCT normalization and PCA
+sct_obj_path <- here::here("R_Data", paste0(scConfig$prefix, "_object_norm.rds"))
+saveRDS(seurat_combined, sct_obj_path)
+seurat_combined <- readRDS(sct_obj_path)
 
-saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
+# Integrate the samples ####
+seurat_combined <- IntegrateLayers(object = seurat_combined, 
+                                   method = RPCAIntegration, 
+                                   orig.reduction = "pca", 
+                                   new.reduction = "integrated.rpca",
+                                   assay = "SCT",
+                                   normalization.method = "SCT",
+                                   verbose = TRUE)
+
+saveRDS(seurat_combined, here::here("R_Data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
 
 # Examine QC metrics by animal ####
-Idents(integrated_seurat) <- integrated_seurat$Sample_name
+Idents(seurat_combined) <- seurat_combined$Sample_name
 
-nFeature_vln_by_animal <- VlnPlot(integrated_seurat, features = "nFeature_RNA", pt.size = 0)
+nFeature_vln_by_animal <- VlnPlot(seurat_combined, features = "nFeature_RNA", pt.size = 0)
 save_plot_pdf(nFeature_vln_by_animal, here::here("Plots/Quality_Control", "nFeature_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
-nCount_vln_by_animal <- VlnPlot(integrated_seurat, features = "nCount_RNA", pt.size = 0)
+nCount_vln_by_animal <- VlnPlot(seurat_combined, features = "nCount_RNA", pt.size = 0)
 save_plot_pdf(nCount_vln_by_animal, here::here("Plots/Quality_Control", "nCount_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
-percent_mito_vln_by_animal <- VlnPlot(integrated_seurat, features = "percent_mito", pt.size = 0)
+percent_mito_vln_by_animal <- VlnPlot(seurat_combined, features = "percent_mito", pt.size = 0)
 save_plot_pdf(percent_mito_vln_by_animal, here::here("Plots/Quality_Control", "percentMito_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
 # Log the completion time
