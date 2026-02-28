@@ -67,11 +67,11 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 ## Directory Structure
 
-- `Raw_Data/` — Raw input files (10x count matrices)
-- `R_Data/` — RDS files of Seurat objects 
-- `Plots/` — Output figures and QC plots
-- `CSV_Results/` - CSVs of cell counts, markers, and DGE results
-- `Logs/` — Run logs and script backups
+- `raw_data/` — Raw input files (10x count matrices)
+- `r_data/` — RDS files of Seurat objects 
+- `plots/` — Output figures and QC plots
+- `csv_results/` - CSVs of cell counts, markers, and DGE results
+- `logs/` — Run logs and script backups
 - `R/` — R scripts
 
 ## Metadata Format
@@ -84,18 +84,18 @@ This repository provides a streamlined pipeline for analyzing 10x Chromium singl
 
 | Sample_name | Sex | Treatment | Age | Raw_data_dir |
 |---|---|---|---|---|
-| Subject_1 | M | Drug | 24 | "Raw_Data/Subject_1/outs" |
-| Subject_2 | F | Ctrl | 27 | "Raw_Data/Subject_2/outs" |
-| Subject_3 | M | Ctrl | 27 | "Raw_Data/Subject_3/outs" |
-| Subject_4 | F | Drug | 26 | "Raw_Data/Subject_4/outs" |
+| Subject_1 | M | Drug | 24 | "raw_data/Subject_1/outs" |
+| Subject_2 | F | Ctrl | 27 | "raw_data/Subject_2/outs" |
+| Subject_3 | M | Ctrl | 27 | "raw_data/Subject_3/outs" |
+| Subject_4 | F | Drug | 26 | "raw_data/Subject_4/outs" |
 
 **Saved as a CSV:**
 ```
 Sample_name,Sex,Treatment,Age,Raw_data_dir
-Subject_1,M,Drug,24,"Raw_Data/Subject_1/outs"
-Subject_2,F,Ctrl,27,"Raw_Data/Subject_2/outs"
-Subject_3,M,Ctrl,27,"Raw_Data/Subject_3/outs"
-Subject_4,F,Drug,26,"Raw_Data/Subject_4/outs"
+Subject_1,M,Drug,24,"raw_data/Subject_1/outs"
+Subject_2,F,Ctrl,27,"raw_data/Subject_2/outs"
+Subject_3,M,Ctrl,27,"raw_data/Subject_3/outs"
+Subject_4,F,Drug,26,"raw_data/Subject_4/outs"
 ```
 
 ## Marker Gene Database

@@ -42,7 +42,7 @@ seurat_objects <- list()
 
 # Filter data ####
 for (sample in str_sample_list) {
-  sample_seurat <- readRDS(here::here("R_Data", paste0(sample, "_seurat_Doublets.rds")))
+  sample_seurat <- readRDS(here::here("r_data", paste0(sample, "_seurat_Doublets.rds")))
 
   # Filter cells and genes based on scConfig params
   sample_seurat <- qc_filter_seurat(sample_seurat)
@@ -74,19 +74,19 @@ integrated_seurat <- IntegrateData(
   normalization.method = "SCT"
 )
 
-saveRDS(integrated_seurat, here::here("R_Data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
+saveRDS(integrated_seurat, here::here("r_data", paste0(scConfig$prefix, "_SCT_integrated.rds")))
 
 # Examine QC metrics by animal ####
 Idents(integrated_seurat) <- integrated_seurat$Sample_name
 
 nFeature_vln_by_animal <- VlnPlot(integrated_seurat, features = "nFeature_RNA", pt.size = 0)
-save_plot_pdf(nFeature_vln_by_animal, here::here("Plots/Quality_Control", "nFeature_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
+save_plot_pdf(nFeature_vln_by_animal, here::here("plots/quality_control", "nFeature_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
 nCount_vln_by_animal <- VlnPlot(integrated_seurat, features = "nCount_RNA", pt.size = 0)
-save_plot_pdf(nCount_vln_by_animal, here::here("Plots/Quality_Control", "nCount_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
+save_plot_pdf(nCount_vln_by_animal, here::here("plots/quality_control", "nCount_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
 percent_mito_vln_by_animal <- VlnPlot(integrated_seurat, features = "percent_mito", pt.size = 0)
-save_plot_pdf(percent_mito_vln_by_animal, here::here("Plots/Quality_Control", "percentMito_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
+save_plot_pdf(percent_mito_vln_by_animal, here::here("plots/quality_control", "percentMito_ViolinPlot_byAnimal.pdf"), height = 4, width = 6)
 
 # Log the completion time
 write(paste0("03_normalize_and_integrate - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)

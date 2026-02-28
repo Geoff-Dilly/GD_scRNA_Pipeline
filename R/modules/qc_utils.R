@@ -78,7 +78,7 @@ strip_seurat_obj <- function(seurat_obj) {
 
 #' @title Run SoupX Correction
 #' @description Run SoupX on an unfiltered Seurat object and add as assay
-run_soupx_correction <- function(sample, seurat_obj, output_dir = "R_Data") {
+run_soupx_correction <- function(sample, seurat_obj, output_dir = "r_data") {
   # Load the unfiltered matrix for SoupX
   filt_matrix <- Read10X(
   file.path(
@@ -171,7 +171,7 @@ run_doubletfinder <- function(sample, seurat_obj, config = scConfig) {
 
   saveRDS(
     seurat_obj,
-    file = here::here("R_Data", paste0(sample, "_seurat_Doublets.rds"))
+    file = here::here("r_data", paste0(sample, "_seurat_Doublets.rds"))
   )
   return(list(sample, score, call))
 }

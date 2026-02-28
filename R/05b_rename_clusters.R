@@ -33,7 +33,7 @@ on.exit({
 
 # Load data ####
 # Load clustered Seurat object
-combined_seurat <- readRDS(here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
+combined_seurat <- readRDS(here::here("r_data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 
 # Rename Seurat clusters ####
 # Note: Manually edit this field to the correct length
@@ -87,7 +87,7 @@ combined_seurat$CellType <- Idents(combined_seurat)
 Idents(combined_seurat) <- combined_seurat$seurat_clusters
 
 # Save the clustered Seurat object
-saveRDS(combined_seurat, here::here("R_Data", paste0(scConfig$prefix, "_combined_clustered.rds")))
+saveRDS(combined_seurat, here::here("r_data", paste0(scConfig$prefix, "_combined_clustered.rds")))
 
 # Log the completion time
 write(paste0("05b_rename_clusters - Finish: ", Sys.time()), file = here::here("scRNA_Log.txt"), append = TRUE)

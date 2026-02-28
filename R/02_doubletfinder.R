@@ -47,7 +47,7 @@ str_sample_list <- scConfig$Sample_metadata$Sample_name
 
 # Run DoubletFinder in a parallel processing loop
 foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", "stringr")) %dopar% {
-  sample_seurat <- readRDS(here::here("R_Data", paste0(sample_name, "_seurat.rds")))
+  sample_seurat <- readRDS(here::here("r_data", paste0(sample_name, "_seurat.rds")))
 
   sample_seurat <- NormalizeData(sample_seurat)
   sample_seurat <- FindVariableFeatures(sample_seurat, selection.method = "vst", nfeatures = 2000)
@@ -85,7 +85,7 @@ foreach(sample_name = str_sample_list, .packages = c("Seurat", "DoubletFinder", 
 
   saveRDS(
     sample_seurat,
-    file = here::here("R_Data", paste0(sample_name, "_seurat_Doublets.rds"))
+    file = here::here("r_data", paste0(sample_name, "_seurat_Doublets.rds"))
   )
   NULL
 }

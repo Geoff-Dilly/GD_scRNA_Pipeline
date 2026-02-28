@@ -103,7 +103,7 @@ filt_matrix <- Read10X(
   }
   saveRDS(
     sample_seurat,
-    file = here::here("R_Data", paste0(sample$Sample_name, "_seurat.rds"))
+    file = here::here("r_data", paste0(sample$Sample_name, "_seurat.rds"))
   )
 
   return(top_ambient)
@@ -114,7 +114,7 @@ if (scConfig$compute_soupx) {
   summary_df <- bind_rows(top_ambient_genes)
   write.csv(
     summary_df,
-    here::here("CSV_Results", "Ambient_genes_summary.csv"),
+    here::here("csv_results", "Ambient_genes_summary.csv"),
     row.names = FALSE
   )
 }

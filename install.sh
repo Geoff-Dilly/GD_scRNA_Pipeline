@@ -13,20 +13,20 @@ scRNA_home_dir=$(pwd)
 echo -e "\nSetting up scRNA analysis pipeline in: \n$scRNA_home_dir\n"
 
 # Create the directories that the single-cell pipeline needs to run
-mkdir -p "CSV_Results/Cluster_Counts"
-mkdir -p "CSV_Results/DEGs_All"
-mkdir -p "CSV_Results/Marker_Genes_All"
-mkdir -p "Raw_Data"
-mkdir -p "Plots/Clustering_Plots/Marker_Feature_Plots/"
-mkdir -p "Plots/Clustering_Plots/Marker_Violin_Plots/"
-mkdir -p "Plots/DESEQ_Plots/Dispersion_Plots"
-mkdir -p "Plots/DESEQ_Plots/Heatmaps"
-mkdir -p "Plots/DESEQ_Plots/MA_Plots"
-mkdir -p "Plots/DESEQ_Plots/PCAs"
-mkdir -p "Plots/DESEQ_Plots/Volcano_Plots"
-mkdir -p "Plots/Quality_Control"
-mkdir -p "R_Data"
-mkdir -p "Logs"
+mkdir -p "csv_results/cluster_counts"
+mkdir -p "csv_results/degs_all"
+mkdir -p "csv_results/marker_genes_all"
+mkdir -p "raw_data"
+mkdir -p "plots/clustering_plots/marker_feature_plots/"
+mkdir -p "plots/clustering_plots/marker_violin_plots/"
+mkdir -p "plots/deseq_plots/dispersion_plots"
+mkdir -p "plots/deseq_plots/heatmaps"
+mkdir -p "plots/deseq_plots/ma_plots"
+mkdir -p "plots/deseq_plots/pca_plots"
+mkdir -p "plots/deseq_plots/volcano_plots"
+mkdir -p "plots/quality_control"
+mkdir -p "r_data"
+mkdir -p "logs"
 
 # Add a here file to the home directory
 touch .here
@@ -67,7 +67,7 @@ scConfig.Home_folder <-   "path/to/home/dir"
 # Should contain data that can be read by the Read10X() function in Seurat
 # Data should be located at <Raw_data_folder>/<Sample_name>/<Sample_name>/outs/filtered_feature_bc_matrix
 # In order to run SoupX, .../unfiltered_feature_bc_matrix is also necessary
-scConfig.Raw_data_folder <- "Raw_Data"
+scConfig.Raw_data_folder <- "raw_data"
 
 # mito_pattern - Datatype: String
 # Str pattern that identifies mitochondrial genes
@@ -150,11 +150,11 @@ sed 's|"path/to/home/dir"|"'"$scRNA_home_dir"'"|' sc_experiment_config.R > temp 
 if [ ! -f ".gitignore" ]; then
 cat > .gitignore <<'EOF'
 # Ignore generated data and logs
-R_Data/
-Raw_Data/
-Logs/
-Plots/
-CSV_Results/
+r_data/
+raw_data/
+logs/
+plots/
+csv_results/
 snRNA_Log.txt
 
 # Ignore home folder declaration

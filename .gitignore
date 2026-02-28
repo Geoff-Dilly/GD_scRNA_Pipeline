@@ -1,10 +1,10 @@
 # Ignore generated data and logs
-R_Data/
-Raw_Data/
-Logs/
-Plots/
-CSV_Results/
-snRNA_Log.txt
+r_data/
+raw_data/
+logs/
+p[lots/
+csv_results/
+snrna_log.txt
 
 # Ignore home folder declaration
 analysis_home_dir.R

@@ -3,10 +3,10 @@
 #' @title Write Script Log
 #' @description This function writes a log of the script execution,
 #' @description including the script content, configuration file, and session info.
-write_script_log <- function(script_file, config_file = "sc_experiment_config.yaml", log_dir = "Logs/") {
+write_script_log <- function(script_file, config_file = "sc_experiment_config.yaml", log_dir = "logs/") {
   timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
 
-  # Open a log file in the Logs directory
+  # Open a log file in the logs directory
   log_file <- file.path(log_dir, paste0("Time_", timestamp, "_Script_Log_",
                                         tools::file_path_sans_ext(basename(script_file)), ".txt"))
 
@@ -32,11 +32,11 @@ write_script_log <- function(script_file, config_file = "sc_experiment_config.ya
 #' @title Check Required Directories
 #' @description This function checks if the required directories exist and suggests install.sh if not.
 check_required_dirs <- function() {
-  required_dirs <- c("CSV_Results/Cluster_Counts", "CSV_Results/DEGs_All",
-                     "CSV_Results/Marker_Genes_All", "Raw_Data", "Plots/Clustering_Plots/Marker_Feature_Plots/",
-                     "Plots/Clustering_Plots/Marker_Violin_Plots/", "Plots/DESEQ_Plots/Dispersion_Plots",
-                     "Plots/DESEQ_Plots/Heatmaps", "Plots/DESEQ_Plots/MA_Plots", "Plots/DESEQ_Plots/PCAs",
-                     "Plots/DESEQ_Plots/Volcano_Plots", "Plots/Quality_Control", "R_Data", "Logs")
+  required_dirs <- c("csv_results/cluster_counts", "csv_results/degs_all",
+                     "csv_results/marker_genes_all", "raw_data", "plots/clustering_plots/marker_feature_plots/",
+                     "plots/clustering_plots/marker_violin_plots/", "plots/deseq_plots/dispersion_plots",
+                     "plots/deseq_plots/heatmaps", "plots/deseq_plots/ma_plots", "plots/deseq_plots/pca_plots",
+                     "plots/deseq_plots/volcano_plots", "plots/quality_control", "r_data", "logs")
 
   missing_dirs <- required_dirs[!dir.exists(required_dirs)]
 
