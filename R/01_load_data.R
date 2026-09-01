@@ -83,7 +83,8 @@ filt_matrix <- Read10X(
     else
       "filtered_feature_bc_matrix"
   )
-)  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
+)  
+  sample_seurat <- CreateSeuratObject(counts = filt_matrix, project = scConfig$project_name, min.cells = 1, min.features = 1)
 
   # Compute SoupX assay (optional)
   if (scConfig$compute_soupx) {
