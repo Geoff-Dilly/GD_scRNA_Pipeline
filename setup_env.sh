@@ -24,8 +24,8 @@ conda env create -f sc_analysis_env.yaml --name $ENV_NAME
 conda activate $ENV_NAME
 
 # Install packages from Github
-Rscript -e 'devtools::install_github("chris-mcginnis-ucsf/DoubletFinder")'
-Rscript -e 'devtools::install_github("immunogenomics/presto")'
+Rscript -e 'pak:pak("chris-mcginnis-ucsf/DoubletFinder")'
+Rscript -e 'pak:pak("immunogenomics/presto")'
 
 # Install glmGamPoi in R
 # glmGamPoi causes issues in MacOS otherwise
